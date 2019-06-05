@@ -1,6 +1,7 @@
 # Pygame grid class for graphing calculator
 import pygame, math
 from abc import ABCMeta, abstractmethod
+from float_rounder import *
 pygame.init()
 
 class Grid(object):
@@ -24,7 +25,7 @@ class Grid(object):
         self.font = font
         # non-optional
         self.scale = 1
-        self.multiplierSequenceList = [2.0,2.5,2.0]
+        self.multiplierSequenceList = [2,2.5,2]
         self.currentMultiplierIndex = 0
         self.numOfDigits = 0
 
@@ -111,17 +112,31 @@ class Grid(object):
         while yChange < size[1]//2:
             pygame.draw.line(screen,(127,127,127),(0,size[1]/2+yChange),(size[0],size[1]/2+yChange),1)
             pygame.draw.line(screen,(127,127,127),(0,size[1]/2-yChange),(size[0],size[1]/2-yChange),1)
-            if (yChange // self.height) * self.scale >= 1:
-                self.printTextY(str(int((yChange // self.height) * self.scale)),font,screen,size[0]//2,size[1]/2-yChange)
-                self.printTextY(str(int((yChange // self.height) * self.scale * -1)),font,screen,size[0]//2,size[1]/2+yChange)
+            if ((yChange // self.width) * self.scale) == int((yChange // self.width) * self.scale) and yChange != 0:
+                if self.scale >= 1000000:
+                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale))[0]+'e'+str(len(str(self.scale))-1),font,screen,size[0]//2,size[1]/2-yChange)
+                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1)[0:2]+'e'+str(len(str(self.scale))-1),font,screen,size[0]//2,size[1]/2+yChange)
+                else:
+                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)),font,screen,size[0]//2,size[1]/2-yChange)
+                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1),font,screen,size[0]//2,size[1]/2+yChange)
             elif yChange != 0:
-                self.printTextY(str(((yChange // self.height) * self.scale)/1),font,screen,size[0]//2,size[1]/2-yChange)
-                self.printTextY(str(((yChange // self.height) * self.scale * -1)/1),font,screen,size[0]//2,size[1]/2+yChange)
+                self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)),font,screen,size[0]//2,size[1]/2-yChange)
+                self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1),font,screen,size[0]//2,size[1]/2+yChange)
             yChange += self.height
 
         while xChange < size[0]//2:
             pygame.draw.line(screen,(127,127,127),(size[0]/2+xChange,0),(size[0]/2+xChange,size[1]),1)
             pygame.draw.line(screen,(127,127,127),(size[0]/2-xChange,0),(size[0]/2-xChange,size[1]),1)
+            if ((xChange // self.width) * self.scale) == int((xChange // self.width) * self.scale) and xChange != 0:
+                if self.scale >= 1000000:
+                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale))[0]+'e'+str(len(str(self.scale))-1),font,screen,size[0]/2+xChange,size[1]/2)
+                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1)[0:2]+'e'+str(len(str(self.scale))-1),font,screen,size[0]/2-xChange,size[1]/2)
+                else:
+                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)),font,screen,size[0]/2+xChange,size[1]/2)
+                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1),font,screen,size[0]/2-xChange,size[1]/2)
+            elif xChange != 0:
+                self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)),font,screen,size[0]/2+xChange,size[1]/2)
+                self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1),font,screen,size[0]/2-xChange,size[1]/2)
             xChange += self.width
 
         Grid.printText('0',font,screen,size[0]//2-2,size[1]//2+2)
@@ -133,28 +148,21 @@ class Grid(object):
     # zoom in and out
     def zoom(self,zoomDirection):
         # zoom out
-        if zoomDirection == "out":
-            self.scale *= self.multiplierSequenceList[self.currentMultiplierIndex]
+        if zoomDirection == "out" and self.scale < 10**21:
+            #self.scale *= self.multiplierSequenceList[self.currentMultiplierIndex]
+            self.scale = multiplyByFloat1(self.scale,self.multiplierSequenceList[self.currentMultiplierIndex])
             self.currentMultiplierIndex += 1
+
         # zoom in
-        elif zoomDirection == "in":
-            self.scale /= self.multiplierSequenceList[self.currentMultiplierIndex-1]
+        elif zoomDirection == "in" and self.scale > 10**-10:
+            #self.scale /= self.multiplierSequenceList[self.currentMultiplierIndex-1]
+            self.scale = multiplyByFloat1(self.scale,1/self.multiplierSequenceList[self.currentMultiplierIndex-1])
             self.currentMultiplierIndex -= 1
-        else:
-            raise SyntaxError('zoom direction should be "in" or "out"')
 
         if self.currentMultiplierIndex == -1:
             self.currentMultiplierIndex = 2
-            if self.scale < 1:
-                self.numOfDigits += 1
-            else:
-                self.numOfDigits -= 1
         elif self.currentMultiplierIndex == 3:
             self.currentMultiplierIndex = 0
-            if self.scale < 1:
-                self.numOfDigits -= 1
-            else:
-                self.numOfDigits += 1
         print(self.scale)
 
 
@@ -166,7 +174,7 @@ def redrawWin():
 
 
 screen = pygame.display.set_mode((800,800))
-grid = Grid(60,60)
+grid = Grid(70,70)
 Use = True
 while Use:
     pygame.time.delay(10)
