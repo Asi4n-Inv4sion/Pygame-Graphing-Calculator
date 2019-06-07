@@ -56,8 +56,14 @@ class Grid(object):
         canvas.blit(theText, textbox)
 
     # draws the grid and text
-    def drawGrid(self,screen):
-        size = screen.get_size()
+    def drawGrid(self,screen,sizex,sizey,tx,ty):
+        '''
+        sizex: the width of the displayed graph in pixels
+        sizey: the height of the displayed graph in pixels
+        tx: translation of the graph right in pixels
+        ty: translation of the graph down in pixels
+        '''
+        size = (sizex,sizey)
         font = pygame.font.SysFont(self.font[0],self.font[1])
         xChange = self.width #* self.scale * 10 ^ self.magnitudeMultiplier
         yChange = self.height #* self.scale * 10 ^ self.magnitudeMultiplier
@@ -65,84 +71,84 @@ class Grid(object):
         while xChange < size[0]//2:
             if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
                 for i in range(1,5):
-                    pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/5)*i),0),(int(size[0]/2+xChange-(self.width/5)*i),size[1]),1)
-                    pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/5)*i),0),(int(size[0]/2-xChange+(self.width/5)*i),size[1]),1)
+                    pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/5)*i)+tx,ty),(int(size[0]/2+xChange-(self.width/5)*i)+tx,size[1]+ty),1)
+                    pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/5)*i)+tx,ty),(int(size[0]/2-xChange+(self.width/5)*i)+tx,size[1]+ty),1)
             else:
                 for i in range(1,4):
-                    pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/4)*i),0),(int(size[0]/2+xChange-(self.width/4)*i),size[1]),1)
-                    pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/4)*i),0),(int(size[0]/2-xChange+(self.width/4)*i),size[1]),1)
+                    pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/4)*i)+tx,ty),(int(size[0]/2+xChange-(self.width/4)*i)+tx,size[1]+ty),1)
+                    pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/4)*i)+tx,ty),(int(size[0]/2-xChange+(self.width/4)*i)+tx,size[1]+ty),1)
             #Grid.printTextTopLeft(str(xChange//(self.width * self.magnitudeMultiplier) * self.scale),font,screen,size[0]//2 + xChange+2,size[1]//2)
             #Grid.printTextTopLeft(str(xChange//(self.width * self.magnitudeMultiplier) * self.scale*-1),font,screen,size[0]//2 - xChange+2,size[1]//2)
             xChange += self.width #* self.scale
 
         if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
             for i in range(1,5):
-                pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/5)*i),0),(int(size[0]/2+xChange-(self.width/5)*i),size[1]),1)
-                pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/5)*i),0),(int(size[0]/2-xChange+(self.width/5)*i),size[1]),1)
+                pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/5)*i)+tx,ty),(int(size[0]/2+xChange-(self.width/5)*i)+tx,size[1]+ty),1)
+                pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/5)*i)+tx,ty),(int(size[0]/2-xChange+(self.width/5)*i)+tx,size[1]+ty),1)
         else:
             for i in range(1,4):
-                pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/4)*i),0),(int(size[0]/2+xChange-(self.width/4)*i),size[1]),1)
-                pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/4)*i),0),(int(size[0]/2-xChange+(self.width/4)*i),size[1]),1)
+                pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/4)*i)+tx,ty),(int(size[0]/2+xChange-(self.width/4)*i)+tx,size[1]+ty),1)
+                pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/4)*i)+tx,ty),(int(size[0]/2-xChange+(self.width/4)*i)+tx,size[1]+ty),1)
 
         while yChange < size[1]//2:
             if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
                 for i in range(1,5):
-                    pygame.draw.line(screen,(230,230,230),(0,int(size[1]/2+yChange-(self.height/5)*i)),(size[0],int(size[1]/2+yChange-(self.height/5)*i)),1)
-                    pygame.draw.line(screen,(230,230,230),(0,int(size[1]/2-yChange+(self.height/5)*i)),(size[0],int(size[1]/2-yChange+(self.height/5)*i)),1)
+                    pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2+yChange-(self.height/5)*i)),(size[0]+tx,ty+int(size[1]/2+yChange-(self.height/5)*i)),1)
+                    pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2-yChange+(self.height/5)*i)),(size[0]+tx,ty+int(size[1]/2-yChange+(self.height/5)*i)),1)
             else:
                 for i in range(1,4):
-                    pygame.draw.line(screen,(230,230,230),(0,int(size[1]/2+yChange-(self.height/4)*i)),(size[0],int(size[1]/2+yChange-(self.height/4)*i)),1)
-                    pygame.draw.line(screen,(230,230,230),(0,int(size[1]/2-yChange+(self.height/4)*i)),(size[0],int(size[1]/2-yChange+(self.height/4)*i)),1)
+                    pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2+yChange-(self.height/4)*i)),(size[0]+tx,ty+int(size[1]/2+yChange-(self.height/4)*i)),1)
+                    pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2-yChange+(self.height/4)*i)),(size[0]+tx,ty+int(size[1]/2-yChange+(self.height/4)*i)),1)
 
             #Grid.printTextTopLeft(str(int(yChange//(self.height * self.magnitudeMultiplier) * self.scale)),font,screen,size[0//2]+2,size[1] - yChange)
             yChange += self.height #* self.scale
 
         if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
             for i in range(1,5):
-                pygame.draw.line(screen,(230,230,230),(0,int(size[1]/2+yChange-(self.height/5)*i)),(size[0],int(size[1]/2+yChange-(self.height/5)*i)),1)
-                pygame.draw.line(screen,(230,230,230),(0,int(size[1]/2-yChange+(self.height/5)*i)),(size[0],int(size[1]/2-yChange+(self.height/5)*i)),1)
+                pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2+yChange-(self.height/5)*i)),(size[0]+tx,ty+int(size[1]/2+yChange-(self.height/5)*i)),1)
+                pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2-yChange+(self.height/5)*i)),(size[0]+tx,ty+int(size[1]/2-yChange+(self.height/5)*i)),1)
         else:
             for i in range(1,4):
-                pygame.draw.line(screen,(230,230,230),(0,int(size[1]/2+yChange-(self.height/4)*i)),(size[0],int(size[1]/2+yChange-(self.height/4)*i)),1)
-                pygame.draw.line(screen,(230,230,230),(0,int(size[1]/2-yChange+(self.height/4)*i)),(size[0],int(size[1]/2-yChange+(self.height/4)*i)),1)
+                pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2+yChange-(self.height/4)*i)),(size[0]+tx,ty+int(size[1]/2+yChange-(self.height/4)*i)),1)
+                pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2-yChange+(self.height/4)*i)),(size[0]+tx,ty+int(size[1]/2-yChange+(self.height/4)*i)),1)
 
         xChange = 0
         yChange = 0
 
         while yChange < size[1]//2:
-            pygame.draw.line(screen,(127,127,127),(0,size[1]/2+yChange),(size[0],size[1]/2+yChange),1)
-            pygame.draw.line(screen,(127,127,127),(0,size[1]/2-yChange),(size[0],size[1]/2-yChange),1)
+            pygame.draw.line(screen,(127,127,127),(tx,ty+size[1]/2+yChange),(size[0]+tx,ty+size[1]/2+yChange),1)
+            pygame.draw.line(screen,(127,127,127),(tx,ty+size[1]/2-yChange),(size[0]+tx,ty+size[1]/2-yChange),1)
             if ((yChange // self.width) * self.scale) == int((yChange // self.width) * self.scale) and yChange != 0:
                 if self.scale >= 1000000:
-                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale))[0]+'e'+str(len(str(self.scale))-1),font,screen,size[0]//2,size[1]/2-yChange)
-                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1)[0:2]+'e'+str(len(str(self.scale))-1),font,screen,size[0]//2,size[1]/2+yChange)
+                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale))[0]+'e'+str(len(str(self.scale))-1),font,screen,size[0]//2+tx,size[1]/2-yChange+ty)
+                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1)[0:2]+'e'+str(len(str(self.scale))-1),font,screen,size[0]//2+tx,size[1]/2+yChange+ty)
                 else:
-                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)),font,screen,size[0]//2,size[1]/2-yChange)
-                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1),font,screen,size[0]//2,size[1]/2+yChange)
+                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)),font,screen,size[0]//2+tx,size[1]/2-yChange+ty)
+                    self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1),font,screen,size[0]//2+tx,size[1]/2+yChange+ty)
             elif yChange != 0:
-                self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)),font,screen,size[0]//2,size[1]/2-yChange)
-                self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1),font,screen,size[0]//2,size[1]/2+yChange)
+                self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)),font,screen,size[0]//2+tx,size[1]/2-yChange+ty)
+                self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1),font,screen,size[0]//2+tx,size[1]/2+yChange+ty)
             yChange += self.height
 
         while xChange < size[0]//2:
-            pygame.draw.line(screen,(127,127,127),(size[0]/2+xChange,0),(size[0]/2+xChange,size[1]),1)
-            pygame.draw.line(screen,(127,127,127),(size[0]/2-xChange,0),(size[0]/2-xChange,size[1]),1)
+            pygame.draw.line(screen,(127,127,127),(size[0]/2+xChange+tx,ty),(size[0]/2+xChange+tx,size[1]+ty),1)
+            pygame.draw.line(screen,(127,127,127),(size[0]/2-xChange+tx,ty),(size[0]/2-xChange+tx,size[1]+ty),1)
             if ((xChange // self.width) * self.scale) == int((xChange // self.width) * self.scale) and xChange != 0:
                 if self.scale >= 1000000:
-                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale))[0]+'e'+str(len(str(self.scale))-1),font,screen,size[0]/2+xChange,size[1]/2)
-                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1)[0:2]+'e'+str(len(str(self.scale))-1),font,screen,size[0]/2-xChange,size[1]/2)
+                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale))[0]+'e'+str(len(str(self.scale))-1),font,screen,size[0]/2+xChange+tx,ty+size[1]/2)
+                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1)[0:2]+'e'+str(len(str(self.scale))-1),font,screen,size[0]/2-xChange+tx,ty+size[1]/2)
                 else:
-                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)),font,screen,size[0]/2+xChange,size[1]/2)
-                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1),font,screen,size[0]/2-xChange,size[1]/2)
+                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)),font,screen,size[0]/2+xChange+tx,ty+size[1]/2)
+                    self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1),font,screen,size[0]/2-xChange+tx,ty+size[1]/2)
             elif xChange != 0:
-                self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)),font,screen,size[0]/2+xChange,size[1]/2)
-                self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1),font,screen,size[0]/2-xChange,size[1]/2)
+                self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)),font,screen,size[0]/2+xChange+tx,ty+size[1]/2)
+                self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1),font,screen,size[0]/2-xChange+tx,ty+size[1]/2)
             xChange += self.width
 
-        Grid.printText('0',font,screen,size[0]//2-2,size[1]//2+2)
+        Grid.printText('0',font,screen,size[0]//2-2+tx,size[1]//2+2+ty)
 
-        pygame.draw.line(screen,(0,0,0),(0,size[1]/2),(size[0],size[1]/2),2)
-        pygame.draw.line(screen,(0,0,0),(size[0]/2,0),(size[0]/2,size[1]),2)
+        pygame.draw.line(screen,(0,0,0),(tx,ty+size[1]/2),(size[0]+tx,ty+size[1]/2),2)
+        pygame.draw.line(screen,(0,0,0),(size[0]/2+tx,ty),(size[0]/2+tx,ty+size[1]),2)
 
 
     # zoom in and out
@@ -168,7 +174,7 @@ class Grid(object):
 
 def redrawWin():
     screen.fill((255,255,255))
-    grid.drawGrid(screen)
+    grid.drawGrid(screen,800,800,0,0)
 
     pygame.display.update()
 
