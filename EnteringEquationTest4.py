@@ -1,4 +1,4 @@
-#Entering Equation
+#Entering and Analyzing Equation
 
 # To-do:
 # - Make sure you cannot enter invalid characters into the equation.
@@ -10,7 +10,10 @@
 #A + B * C = +A*BC
 #(A + B)*C = *+ABC
 
+import math
+radOrDeg = "deg"
 operators = ["+","-","*","/","^",".","sin","cos","tan","sqrt"]
+conversions = ["sin","cos","tan","sqrt"]
 isError = True
 #Replaces a list with one element, with that element. The list was pointless
 def RemoveExtraBrackets(n):
@@ -86,38 +89,85 @@ def Setup_4(e,i):
         i += 1
     return e
 
+def Setup_5(e,i):
+    #removes extra '+', changes subtracton to addition of a negative, and also changes 2 '-' to '+'
+    while i < len(e)-1:
+        if e[i] == "-" and (type(e[i+1]) is int or type(e[i+1]) is float):
+            e[i] = "+"
+            e[i+1] = -e[i+1]
+        elif e[i] == "-" and e[i+1] == "-":
+            e[i] = "+"
+            del e[i+1]
+        if e[i] == "+" and e[i+1] == "+":
+            del e[i+1]
+        i += 1
+    return e
+
+def Setup_5(e,i):
+    #Pre-calculates all "conversion" operations like sine leaving only basic ones like adding
+    global radOrDeg
+    while i < len(e)-1:
+        if e[i] in conversions:
+            if e[i].lower() == "sin":
+                if radOrDeg == "deg":
+                    e[i] = round(math.sin(math.radians(e[i+1])),5)
+                    del e[i+1]
+                elif radOrDeg == "rad":
+                    e[i] = round(math.sin(e[i+1]),5)
+                    del e[i+1]
+            elif e[i].lower() == "cos":
+                if radOrDeg == "deg":
+                    e[i] = round(math.cos(math.radians(e[i+1])),5)
+                    del e[i+1]
+                elif radOrDeg == "rad":
+                    e[i] = round(math.cos(e[i+1]),5)
+                    del e[i+1]
+            elif e[i].lower() == "tan":
+                if radOrDeg == "deg":
+                    e[i] = round(math.tan(math.radians(e[i+1])),5)
+                    del e[i+1]
+                elif radOrDeg == "rad":
+                    e[i] = round(math.tan(e[i+1]),5)
+                    del e[i+1]
+                del e[i+1]
+            elif e[i].lower() == "sqrt":
+                e[i] = math.sqrt(e[i+1])
+                del e[i+1]
+        i += 1
+    return e
+
 #Prepares the inputted equation to calculate
 def Initialize(e):
     e = Setup_1(e,0)
     e = Setup_2(e,1)
     e = Setup_3(e,2)
     e = Setup_4(e,0)
-    print(e)
+    e = Setup_5(e,0)
+    print("Equation",e)
     return e
 
 #2*(x-sin30)+1   [2, '*', ['x', '-', 'sin', 30] + 1]     [2,*,(3,+,1)]   2,3,1,+,*    1*2+3*4
 
-def PostFix(e):
-    priority = {"^":3,"*":2,"/":2,"+":1,"-":1}
-    opstack = []
-    output = []
-    temp = None
-    for i in range(len(e)):
-        #if type(e[i]) is list:
-        if type(e[i]) is int or type(e[i]) is float:
+def PostFix(e,i,opstack,output):
+    priority = {"^":3,"*":2,"/":2,"-":1,"+":1}
+    while i < len(e):
+        if type(e[i]) is list:
+            temp = PostFix(e[i],0,[],[])
+            for t in temp:
+                output.append(t)
+        elif type(e[i]) is int or type(e[i]) is float:
             output.append(e[i])
         elif e[i] in operators:
             if len(opstack) > 0 and priority[opstack[-1]] > priority[e[i]]:
                 output.append(opstack[-1])
                 del opstack[-1]
             opstack.append(e[i])
-        print(output,opstack)
+        i += 1
     for op in reversed(opstack):
         output.append(op)
-    print(output,opstack)  
     return output
 
 equation = list(''.join(input("Enter equation: y = ").split(" ")))
 newEquation = Initialize(equation)
-function = PostFix(newEquation)
-#print(function)
+function = PostFix(newEquation,0,[],[])
+print("Function",','.join([str(c) for c in function]))
