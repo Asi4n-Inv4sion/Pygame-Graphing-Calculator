@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from float_rounder import *
 pygame.init()
 
-class Grid(object):
+class CalcGrid(object):
 
     '''
     Attributes:
@@ -179,7 +179,7 @@ class Grid(object):
 
 
 screen = pygame.display.set_mode((1366,768),pygame.FULLSCREEN)
-grid = Grid(70,70)
+grid = CalcGrid(70,70)
 Use = True
 while Use:
     pygame.time.delay(10)
