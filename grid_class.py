@@ -146,7 +146,7 @@ class CalcGrid(object):
                 self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1),font,screen,size[0]/2-xChange+tx,ty+size[1]/2)
             xChange += self.width
 
-        Grid.printText('0',font,screen,size[0]//2-2+tx,size[1]//2+2+ty)
+        self.printText('0',font,screen,size[0]//2-2+tx,size[1]//2+2+ty)
 
         pygame.draw.line(screen,(0,0,0),(tx,ty+size[1]/2),(size[0]+tx,ty+size[1]/2),2)
         pygame.draw.line(screen,(0,0,0),(size[0]/2+tx,ty),(size[0]/2+tx,ty+size[1]),2)
@@ -179,7 +179,7 @@ class CalcGrid(object):
 
 
 screen = pygame.display.set_mode((1366,768),pygame.FULLSCREEN)
-grid = CalcGrid(70,70)
+grid = Grid(70,70)
 Use = True
 while Use:
     pygame.time.delay(10)
