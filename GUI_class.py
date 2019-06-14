@@ -16,6 +16,16 @@ class functionList(Grid):
         if symbol != None and self.selectedFunction != None:
             if symbol == '÷':
                 self.equations[self.selectedFunction] += '/'
+            elif symbol == 'a^2':
+                self.equations[self.selectedFunction] += '^2'
+            elif symbol == 'a^3':
+                self.equations[self.selectedFunction] += '^3'
+            elif symbol == 'a^b':
+                self.equations[self.selectedFunction] += '^('
+            elif symbol == '√a':
+                self.equations[self.selectedFunction] += 'sqrt('
+            elif symbol == '←':
+                self.equations[self.selectedFunction] = self.equations[self.selectedFunction][:-1]
             else:
                 self.equations[self.selectedFunction] += symbol
             print(self.equations[self.selectedFunction])
