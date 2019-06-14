@@ -81,12 +81,12 @@ class CalcGrid(object):
 
         if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
             for i in range(1,5):
-                if int(size[0]/2+xChange-(self.width/5)*i) > size[0]//2:
+                if int(size[0]/2+xChange-(self.width/5)*i) < size[0]:
                     pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/5)*i)+tx,ty),(int(size[0]/2+xChange-(self.width/5)*i)+tx,size[1]+ty))
                     pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/5)*i)+tx,ty),(int(size[0]/2-xChange+(self.width/5)*i)+tx,size[1]+ty))
         else:
             for i in range(1,4):
-                if int(size[0]/2+xChange-(self.width/4)*i) > size[0]//2:
+                if int(size[0]/2+xChange-(self.width/4)*i) < size[0]:
                     pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/4)*i)+tx,ty),(int(size[0]/2+xChange-(self.width/4)*i)+tx,size[1]+ty))
                     pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/4)*i)+tx,ty),(int(size[0]/2-xChange+(self.width/4)*i)+tx,size[1]+ty))
 
@@ -104,12 +104,12 @@ class CalcGrid(object):
 
         if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
             for i in range(1,5):
-                if int(size[1]/2+yChange-(self.height/5)*i) < size[1]:
+                if int(size[1]/2+yChange-(self.height/5)*i) < size[1]//2:
                     pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2+yChange-(self.height/5)*i)),(size[0]+tx,ty+int(size[1]/2+yChange-(self.height/5)*i)))
                     pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2-yChange+(self.height/5)*i)),(size[0]+tx,ty+int(size[1]/2-yChange+(self.height/5)*i)))
         else:
             for i in range(1,4):
-                if int(size[1]/2+yChange-(self.height/4)*i) < size[1]:
+                if int(size[1]/2+yChange-(self.height/4)*i) < size[1]//2:
                     pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2+yChange-(self.height/4)*i)),(size[0]+tx,ty+int(size[1]/2+yChange-(self.height/4)*i)))
                     pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2-yChange+(self.height/4)*i)),(size[0]+tx,ty+int(size[1]/2-yChange+(self.height/4)*i)))
 
