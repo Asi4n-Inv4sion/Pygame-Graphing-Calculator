@@ -3,7 +3,6 @@ from pygrid import Grid
 
 pygame.init()
 
-
 class functionList(Grid):
     def __init__(self,rect,rows,columns,outline=1,gap=0,font=(None,12),font_colour=(0,0,0),text=[],visible=True):
         Grid.__init__(self,rect,rows,columns,outline,gap,font,font_colour,text,visible)
@@ -13,22 +12,37 @@ class functionList(Grid):
             self.equations.append('')
 
     def equationAppend(self,symbol):
-        if symbol != None and self.selectedFunction != None:
+        if symbol != None and self.selectedFunction != None and len(self.equations[self.selectedFunction]) < 30:
             if symbol == '÷':
                 self.equations[self.selectedFunction] += '/'
-            elif symbol == 'a^2':
+            elif symbol == 'a^2' and len(self.equations[self.selectedFunction]) < 29:
                 self.equations[self.selectedFunction] += '^2'
-            elif symbol == 'a^3':
+            elif symbol == 'a^3' and len(self.equations[self.selectedFunction]) < 29:
                 self.equations[self.selectedFunction] += '^3'
-            elif symbol == 'a^b':
+            elif symbol == 'a^b' and len(self.equations[self.selectedFunction]) < 29:
                 self.equations[self.selectedFunction] += '^('
-            elif symbol == '√a':
+            elif symbol == '√a' and len(self.equations[self.selectedFunction]) < 26:
                 self.equations[self.selectedFunction] += 'sqrt('
-            elif symbol == '←':
-                self.equations[self.selectedFunction] = self.equations[self.selectedFunction][:-1]
-            else:
+            elif symbol == 'sin' or symbol == 'cos' or symbol == 'tan':
+                if len(self.equations[self.selectedFunction]) < 28:
+                    self.equations[self.selectedFunction] += symbol
+            elif symbol != '←':
                 self.equations[self.selectedFunction] += symbol
+
+
+        if symbol == '←' and self.selectedFunction != None:
+            self.equations[self.selectedFunction] = self.equations[self.selectedFunction][:-1]
+        if symbol != None and self.selectedFunction != None:
             print(self.equations[self.selectedFunction])
+
+    def equationKeyPress(self,key):
+        if key == pygame.K_BACKSPACE:
+            self.equationAppend('←')
+        elif key == pygame.K_DELETE:
+            if self.selectedFunction != None:
+                self.equations[self.selectedFunction] = ''
+        self.updateFunctions()
+
 
     def selectFunc(self,cell):
         if cell != None:
