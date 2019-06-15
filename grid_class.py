@@ -26,6 +26,8 @@ class CalcGrid(object):
         self.scale = 1
         self.multiplierSequenceList = [2,2.5,2]
         self.currentMultiplierIndex = 0
+        self.hTranslation = 0
+        self.vTranslation = 0
 
     @staticmethod
     def printText(text, font, canvas, x, y):
@@ -67,6 +69,7 @@ class CalcGrid(object):
         xChange = self.width
         yChange = self.height
 
+        # draws inner light vertical lines
         while xChange < size[0]//2:
             if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
                 for i in range(1,5):
@@ -79,6 +82,7 @@ class CalcGrid(object):
 
             xChange += self.width
 
+        # draws outer light vertical lines
         if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
             for i in range(1,5):
                 if int(size[0]/2+xChange-(self.width/5)*i) < size[0]:
@@ -90,6 +94,7 @@ class CalcGrid(object):
                     pygame.draw.line(screen,(230,230,230),(int(size[0]/2+xChange-(self.width/4)*i)+tx,ty),(int(size[0]/2+xChange-(self.width/4)*i)+tx,size[1]+ty))
                     pygame.draw.line(screen,(230,230,230),(int(size[0]/2-xChange+(self.width/4)*i)+tx,ty),(int(size[0]/2-xChange+(self.width/4)*i)+tx,size[1]+ty))
 
+        # draws inner light horizontal lines
         while yChange < size[1]//2:
             if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
                 for i in range(1,5):
@@ -102,20 +107,22 @@ class CalcGrid(object):
 
             yChange += self.height
 
+        # draws outer light horizonal lines
         if self.multiplierSequenceList[self.currentMultiplierIndex] == 2.0:
             for i in range(1,5):
-                if int(size[1]/2+yChange-(self.height/5)*i) < size[1]//2:
+                if int(size[1]/2+yChange-(self.height/5)*i) < size[1]:
                     pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2+yChange-(self.height/5)*i)),(size[0]+tx,ty+int(size[1]/2+yChange-(self.height/5)*i)))
                     pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2-yChange+(self.height/5)*i)),(size[0]+tx,ty+int(size[1]/2-yChange+(self.height/5)*i)))
         else:
             for i in range(1,4):
-                if int(size[1]/2+yChange-(self.height/4)*i) < size[1]//2:
+                if int(size[1]/2+yChange-(self.height/4)*i) < size[1]:
                     pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2+yChange-(self.height/4)*i)),(size[0]+tx,ty+int(size[1]/2+yChange-(self.height/4)*i)))
                     pygame.draw.line(screen,(230,230,230),(tx,ty+int(size[1]/2-yChange+(self.height/4)*i)),(size[0]+tx,ty+int(size[1]/2-yChange+(self.height/4)*i)))
 
         xChange = 0
         yChange = 0
 
+        # draws dark horizonal lines and values on the y axis
         while yChange < size[1]//2:
             pygame.draw.line(screen,(127,127,127),(tx,ty+size[1]/2+yChange),(size[0]+tx,ty+size[1]/2+yChange),1)
             pygame.draw.line(screen,(127,127,127),(tx,ty+size[1]/2-yChange),(size[0]+tx,ty+size[1]/2-yChange),1)
@@ -131,6 +138,7 @@ class CalcGrid(object):
                 self.printTextY(str(multiplyByFloat1(yChange // self.height, self.scale)*-1),font,screen,size[0]//2+tx,size[1]/2+yChange+ty)
             yChange += self.height
 
+        # draws dark vertical lines and values on the x axis
         while xChange < size[0]//2:
             pygame.draw.line(screen,(127,127,127),(size[0]/2+xChange+tx,ty),(size[0]/2+xChange+tx,size[1]+ty),1)
             pygame.draw.line(screen,(127,127,127),(size[0]/2-xChange+tx,ty),(size[0]/2-xChange+tx,size[1]+ty),1)
@@ -146,8 +154,10 @@ class CalcGrid(object):
                 self.printTextX(str(multiplyByFloat1(xChange // self.width, self.scale)*-1),font,screen,size[0]/2-xChange+tx,ty+size[1]/2)
             xChange += self.width
 
+        # prints 0 at the origin
         self.printText('0',font,screen,size[0]//2-2+tx,size[1]//2+2+ty)
 
+        # prints axis lines
         pygame.draw.line(screen,(0,0,0),(tx,ty+size[1]/2),(size[0]+tx,ty+size[1]/2),2)
         pygame.draw.line(screen,(0,0,0),(size[0]/2+tx,ty),(size[0]/2+tx,ty+size[1]),2)
 
