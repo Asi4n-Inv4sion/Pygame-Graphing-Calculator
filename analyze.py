@@ -15,6 +15,7 @@ radOrDeg = "deg"
 operators = ["+","-","*","/","^",".","sin","cos","tan","sqrt"]
 conversions = ["sin","cos","tan","sqrt"]
 isError = True
+customVars = {}
 
 #Replaces a list with one element, with that element. The list was pointless
 def RemoveExtraBrackets(n):
@@ -24,8 +25,11 @@ def RemoveExtraBrackets(n):
         return n
     return n
 
-def Setup_1(e,i,customVars):
-    global isError
+def Setup_1(e,i):
+    global customVars
+    if e[0] in ["+","*","/","^","."] or e[-1] in operators: return None
+    elif len(e) >= 3 and ''.join(e[-3:]) in operators: return None
+    elif len(e) >= 4 and ''.join(e[-4:]) in operators: return None
     while i < len(e):
         #initialize areas with brackets
         if e[i] == "(":
@@ -42,13 +46,11 @@ def Setup_1(e,i,customVars):
                         e[i] = RemoveExtraBrackets(e[i][0]) #If a list has one element, there's no need for the list
                     break
             if b != 0:
-                print("Error: Unconsistent Brackets")
+                return None
         #sets all possible integers into an integer
         if type(e[i]) is str:
             try: int(e[i])
-            except ValueError:
-                if type(customVars) is dict and e[i] not in customVars:
-                    isError = True
+            except ValueError: ''''''
             else: e[i] = int(e[i])
         i += 1
     while len(e) == 1 and type(e[0]) is list:
@@ -90,6 +92,9 @@ def Setup_4(e,i):
             del e[i]
             i -= 1#counters the i+=1 below to stay on the same index next iteration
         i += 1
+    for n in range(len(e)):
+        if type(e[n]) is str and e[n] not in operators and e[n] not in customVars and e[n] not in ['x','y']:
+            return None
     return e
 
 def Setup_5(e,i):
@@ -107,11 +112,13 @@ def Setup_5(e,i):
     return e
 
 #Prepares the inputted equation to calculate
-def Initialize(e,customVars=None):
-    e = Setup_1(e,0,customVars)
+def Initialize(e):
+    e = Setup_1(e,0)
+    if e == None: return None
     e = Setup_2(e,1)
     e = Setup_3(e,2)
     e = Setup_4(e,0)
+    if e == None: return None
     e = Setup_5(e,0)
     return e
 
@@ -205,7 +212,7 @@ def Calculate(e,temp,i,x):
     f = Postfix(PreCalc(e,0,x),0,[],[])
     #Uses a pre-sorted bedmas-friendly format to calculate with called "Postfix notation"
     if len(f) == 0:
-        return temp
+        return None
     else:
         while i < len(f):
             if type(f[i]) is int or type(f[i]) is float:
