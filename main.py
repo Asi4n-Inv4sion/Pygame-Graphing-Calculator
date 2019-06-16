@@ -19,27 +19,27 @@ HEIGHT = 720
 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 functions = []
-scale = 1
 
 def getPoints(e,width,scale):
-    #p = [(xcord-1,ycord//2)]#starting point, off he screen to hide the first line
     p = []
-    for x in range(-width//2,width//2):
-        y = Calculate(e[:],[],0,x/70)*70*scale#equation variable changes depending on the graph being drawn
-        #If too big or small, set a limit. y//abs(y) gets the sign (+,-)
-        #print("y:",y)
-        if y >= 10**5 or y <= -10**5:
-            y = y//abs(y)*10**5
+    for x in range(-width//2,width//2):#equation variable changes depending on the graph being drawn
+        y = Calculate(e[:],[],0,x/70*scale)
+        if y != None:
+            y *= 70/scale
         #If the equation has division by 0 at a point, use None as a point
         if y == None:
             p.append(None)
             if x == -width//2:
                 p.append(None)
-        #Add the point to a list
         else:
-            p.append((x,y))
-            if x == -width//2:
+            #If too big or small, set a limit. y//abs(y) gets the sign (+,-)
+            if y >= 10**10 or y <= -10**10:
+                y = y//abs(y)*10**10
+            #Add the point to a list
+            else:
                 p.append((x,y))
+                if x == -width//2:
+                    p.append((x,y))
     return p
 
 def drawFunction(p,xcord,ycord,width,height,scale=1):
@@ -90,7 +90,6 @@ miscfunc = Grid((WIDTH//2-0.24*WIDTH,0.8*HEIGHT+5,0.07*WIDTH,0.2*HEIGHT-5),4,1,1
 variables = Grid((3,0.8*HEIGHT+5,0.25*WIDTH,0.2*HEIGHT-5),4,6,1,2,('monospace',18),(0,0,0),['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','z'],True)
 keyboard = [keypad,operationpad,trigfunc,expofunc,miscfunc,variables]
 
-
 #funcList.equations[0] = 'x'
 #funcList.updateFunctions()
 
@@ -106,7 +105,7 @@ while Use:
         #print(funcs)
         funcs = [Initialize(f) for f in funcs if len(f) > 0]
         #print("F:",funcs)
-        functions = [getPoints(f,round(WIDTH*0.75),scale) for f in funcs if type(f) == list and len(f) > 0]
+        functions = [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
         #if len(func) > 0:
         #    functions[0] = getPoints(Initialize(list(''.join(func).split(" "))),round(WIDTH*0.75))
 
@@ -123,7 +122,6 @@ while Use:
         if event.type == pygame.QUIT:
             Use = False
         if event.type == pygame.KEYDOWN:
-            print(pygame.key.name(event.key))
             if event.key == pygame.K_ESCAPE:
                 Use = False
             else:
