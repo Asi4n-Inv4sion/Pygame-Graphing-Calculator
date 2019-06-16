@@ -1,7 +1,8 @@
 #--------------------------------------------------------------------------------
 # Entering and Analyzing Equation
 # Julian and Leo
-# Analyses 
+# Analyses the equations and fingures out what they mean
+# Also calculates analyzed equations to graph with
 #--------------------------------------------------------------------------------
 
 # To-do:
@@ -31,6 +32,8 @@ def RemoveExtraBrackets(n):
 
 def Setup_1(e,i):
     global customVars
+    if len(e) > 1 and e[0] == "y" and e[1] == "=":
+        del e[0:2]
     #Checking if the equation ends with an operator which doesn't make sense
     if e[0] in ["+","*","/","^","."] or e[-1] in operators: return None
     elif len(e) >= 3 and ''.join(e[-3:]) in operators: return None
@@ -50,8 +53,10 @@ def Setup_1(e,i):
                     temp = e[i+1:i+n+1] #the area inside the set of brackets
                     del e[i:i+n+1]
                     e[i] = Initialize(temp) #initializes the bracketed area
-                    if len(e[i]) == 1:
-                        e[i] = RemoveExtraBrackets(e[i][0]) #If a list has one element, there's no need for the list
+                    if e[i] != None:
+                        if len(e[i]) == 1:
+                            e[i] = RemoveExtraBrackets(e[i][0]) #If a list has one element, there's no need for the list
+                    else: return None
                     break
             if b != 0:
                 return None
@@ -131,10 +136,11 @@ def Setup_5(e,i):
             del e[i+1]
         i += 1
     if len(e) == 3:
-        if e[1] == "=" and e[0] in ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'] and (type(e[2]) is int or type(e[2]) is float):
+        #detects the user trying to create a custom variable and adds it to the dictionary customVars. "e" isn't included as its used for Euler's number
+        if e[1] == "=" and e[0] in ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'] and (type(e[2]) is int or type(e[2]) is float or e[2] in ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']):
             customVars[e[0]] = e[2]
     for n in range(len(e)):
-        if type(e[n]) is str and e[n] not in operators and e[n] not in customVars and e[n] not in ['x','y']:
+        if type(e[n]) is str and e[n] not in operators and e[n] not in customVars and e[n] not in ['x','y','e']:
             return None
     return e
 
@@ -183,9 +189,9 @@ def PreCalc(e,i,xVal=None):
         #Change all x's to the current x value
         elif e[n] == "x" and (type(xVal) is int or type(xVal) is float):
             e[n] = xVal
-        elif e[n] == "π":
+        elif e[n] == "π": #Replaces π with pi
             e[n] = math.pi
-        elif e[n] == "e":
+        elif e[n] == "e": #Replaces e with Euler's number
             e[n] = 2.718281828459
         while e[n] in customVars:#Allows for multiple 'layers' if a=1, 'a' is replaced with 1, if a=b and b=2, 'a' is replaced with 2
             e[n] = customVars[e[n]]
