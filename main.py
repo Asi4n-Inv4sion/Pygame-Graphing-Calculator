@@ -21,7 +21,7 @@ def getPoints(e,width,scale):
     #p = [(xcord-1,ycord//2)]#starting point, off he screen to hide the first line
     p = []
     for x in range(-width//2,width//2):
-        y = Calculate(e[:],[],0,x/70)*70/scale#equation variable changes depending on the graph being drawn
+        y = Calculate(e[:],[],0,x/70)*70*scale#equation variable changes depending on the graph being drawn
         #If too big or small, set a limit. y//abs(y) gets the sign (+,-)
         #print("y:",y)
         if y >= 10**5 or y <= -10**5:
