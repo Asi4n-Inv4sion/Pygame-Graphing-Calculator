@@ -1,5 +1,9 @@
 #--------------------------------------------------------------------------------
-# Graphing Calculator
+# Graphing Calculator for Pygame
+# Julian and Leo
+# User can input functions using the printed buttons or using their keyboard
+# for most functions
+# Given eight inputboxes to define variables or create functions
 #--------------------------------------------------------------------------------
 
 from grid_class import *
@@ -59,7 +63,7 @@ def redrawWin():
     funcList.drawGrid(screen,(0,0,0))
     for f in keyboard:
         f.drawGrid(screen,(0,0,0))
-        
+
     """
     keypad.drawGrid(screen,(0,0,0))
     operationpad.drawGrid(screen,(0,0,0))
@@ -119,6 +123,7 @@ while Use:
         if event.type == pygame.QUIT:
             Use = False
         if event.type == pygame.KEYDOWN:
+            print(pygame.key.name(event.key))
             if event.key == pygame.K_ESCAPE:
                 Use = False
             else:
@@ -142,16 +147,6 @@ while Use:
                     grid.zoom('out')
             if event.button == 1:
                 funcList.selectFunc(funcList.mouseOverCell(mp[0],mp[1]))
-                '''funcClick = True
-                for f in keyboard:
-                    if f.mouseOverCell(mp[0],mp[1]) != None:
-                        funcList.equationAppend(f.text[f.mouseOverCell(mp[0],mp[1])])
-                        break
-                    else:
-                        funcClick = False
-                if funcList.mouseOverCell(mp[0],mp[1]) == None and funcClick == False:
-                    funcList.selectedFunction = None
-                '''
                 if keypad.mouseOverCell(mp[0],mp[1]) != None:
                     funcList.equationAppend(keypad.text[keypad.mouseOverCell(mp[0],mp[1])])
                 elif operationpad.mouseOverCell(mp[0],mp[1]) != None:
