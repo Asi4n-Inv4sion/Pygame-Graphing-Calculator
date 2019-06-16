@@ -1,4 +1,8 @@
-#Entering and Analyzing Equation
+#--------------------------------------------------------------------------------
+# Entering and Analyzing Equation
+# Julian and Leo
+# Analyses 
+#--------------------------------------------------------------------------------
 
 # To-do:
 # - Make and output box(s) for all errors to go
@@ -7,8 +11,8 @@
 # - More error support (multiple '=', starting/ending with operation, etc).
 # - Make dictionary of custom user-created variables
 # - Line intersection points that you can click to toggle the label visibility
-# - Error that doesn't allow more than one of the same user variable like a=1,a=2. what does 'a' equal then?
-# - Changable line types, dotted, actual dots (circles), or full line
+# - Error that doesn't allow more than one of the same user variable like a=1,a=2. What does 'a' equal then?
+
 
 import math
 radOrDeg = "rad"
@@ -27,9 +31,13 @@ def RemoveExtraBrackets(n):
 
 def Setup_1(e,i):
     global customVars
+    #Checking if the equation ends with an operator which doesn't make sense
     if e[0] in ["+","*","/","^","."] or e[-1] in operators: return None
     elif len(e) >= 3 and ''.join(e[-3:]) in operators: return None
     elif len(e) >= 4 and ''.join(e[-4:]) in operators: return None
+    #Won't allow more than 1 = sign
+    if len([n for n in e if n == "="]) > 1:
+        return None
     while i < len(e):
         #initialize areas with brackets
         if e[i] == "(":
@@ -92,23 +100,42 @@ def Setup_4(e,i):
             del e[i]
             i -= 1#counters the i+=1 below to stay on the same index next iteration
         i += 1
-    for n in range(len(e)):
-        if type(e[n]) is str and e[n] not in operators and e[n] not in customVars and e[n] not in ['x','y']:
-            return None
     return e
 
+# [-,[x+1],-,77]
+
+# [-1,*,[x+1],-,77]
+
 def Setup_5(e,i):
+    global customVars
     #removes extra '+', changes subtracton to addition of a negative, and also changes 2 '-' to '+'
     while i < len(e)-1:
         if e[i] == "-" and (type(e[i+1]) is int or type(e[i+1]) is float):
             e[i] = "+"
             e[i+1] = -e[i+1]
+        elif e[i] == "-" and e[i+1] == "x":
+            if i > 0:
+                e[i] = "+"
+                e.insert(i+1,"*")
+                e.insert(i+1,-1)
+                i += 1
+            else:
+                del e[i]
+                e.insert(i,"*")
+                e.insert(i,-1)
+            i += 1
         elif e[i] == "-" and e[i+1] == "-":
             e[i] = "+"
             del e[i+1]
         if e[i] == "+" and e[i+1] == "+":
             del e[i+1]
         i += 1
+    if len(e) == 3:
+        if e[1] == "=" and e[0] in ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'] and (type(e[2]) is int or type(e[2]) is float):
+            customVars[e[0]] = e[2]
+    for n in range(len(e)):
+        if type(e[n]) is str and e[n] not in operators and e[n] not in customVars and e[n] not in ['x','y']:
+            return None
     return e
 
 #Prepares the inputted equation to calculate
@@ -118,8 +145,8 @@ def Initialize(e):
     e = Setup_2(e,1)
     e = Setup_3(e,2)
     e = Setup_4(e,0)
-    if e == None: return None
     e = Setup_5(e,0)
+    if e == None: return None
     return e
 
 def Postfix(e,i,opstack,output):
@@ -147,7 +174,7 @@ def Postfix(e,i,opstack,output):
 
 #-------------------------------------------------- CALCULATIONS ------------------------------------------------------------
 
-def PreCalc(e,i,xVal=None,customVars={}):
+def PreCalc(e,i,xVal=None):
     global radOrDeg
     for n in range(len(e)):
         #If there is a list, repeat the process within it
@@ -160,10 +187,8 @@ def PreCalc(e,i,xVal=None,customVars={}):
             e[n] = math.pi
         elif e[n] == "e":
             e[n] = 2.718281828459
-        '''
         while e[n] in customVars:#Allows for multiple 'layers' if a=1, 'a' is replaced with 1, if a=b and b=2, 'a' is replaced with 2
-            e[n] = customVars(customVars.index(e[n]))
-        '''
+            e[n] = customVars[e[n]]
     #Pre-calculates all "conversion" operations like sine leaving only basic ones like adding
     while i < len(e)-1:
         if e[i] in conversions:
