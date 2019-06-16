@@ -14,14 +14,16 @@ WIDTH = 1280
 HEIGHT = 720
 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
-functions = [[],[],[],[],[],[],[],[]]
+functions = []
+scale = 1
 
-def getPoints(e,width):
+def getPoints(e,width,scale):
     #p = [(xcord-1,ycord//2)]#starting point, off he screen to hide the first line
     p = []
     for x in range(-width//2,width//2):
-        y = Calculate(e[:],[],0,x)#equation variable changes depending on the graph being drawn
+        y = Calculate(e[:],[],0,x/70)*70/scale#equation variable changes depending on the graph being drawn
         #If too big or small, set a limit. y//abs(y) gets the sign (+,-)
+        #print("y:",y)
         if y >= 10**5 or y <= -10**5:
             y = y//abs(y)*10**5
         #If the equation has division by 0 at a point, use None as a point
@@ -37,7 +39,6 @@ def getPoints(e,width):
     return p
 
 def drawFunction(p,xcord,ycord,width,height,scale=1):
-    print(p)
     for i in range(len(p)-1):
         if p[i] != None and p[i+1] != None:
             #pygame.draw.circle(win,(0,0,0),(winW//2+x,winH//2-round(y)),2)
@@ -50,14 +51,15 @@ def redrawWin():
     grid.drawGrid(screen,WIDTH*0.75,HEIGHT*0.8,WIDTH*0.25,0)
 
     #Draws function(s)
-    if len(functions[0]) > 0:
-        drawFunction(functions[0],round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8))
+    for f in range(len(functions)):
+        drawFunction(functions[f],round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8))
     pygame.draw.rect(screen,(255,255,255),(WIDTH*0.25,HEIGHT*0.8,WIDTH*0.75,HEIGHT*0.2))#Covers up the function if it exits the graph
 
     #Drawing keyboard sections
     funcList.drawGrid(screen,(0,0,0))
     for f in keyboard:
         f.drawGrid(screen,(0,0,0))
+        
     """
     keypad.drawGrid(screen,(0,0,0))
     operationpad.drawGrid(screen,(0,0,0))
@@ -84,28 +86,33 @@ miscfunc = Grid((WIDTH//2-0.24*WIDTH,0.8*HEIGHT+5,0.07*WIDTH,0.2*HEIGHT-5),4,1,1
 variables = Grid((3,0.8*HEIGHT+5,0.25*WIDTH,0.2*HEIGHT-5),4,6,1,2,('monospace',18),(0,0,0),['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','z'],True)
 keyboard = [keypad,operationpad,trigfunc,expofunc,miscfunc,variables]
 
-'''
-funcList.equations[0] = 'x'
-funcList.updateFunctions()
-'''
-tick = 0
 
+#funcList.equations[0] = 'x'
+#funcList.updateFunctions()
+
+tick = 0
 # graph translation
 Use = True
 while Use:
     pygame.time.delay(50)
-    '''
     if tick % 20 == 0:
-        func = funcList.equations[0]
-        if len(func) > 0:
-            functions[0] = getPoints(Initialize(list(''.join(func).split(" "))),round(WIDTH*0.75))'''
+        funcs = []
+        for f in funcList.equations:
+            funcs.append(list(f))
+        #print(funcs)
+        funcs = [Initialize(f) for f in funcs if len(f) > 0]
+        #print("F:",funcs)
+        functions = [getPoints(f,round(WIDTH*0.75),scale) for f in funcs if type(f) == list and len(f) > 0]
+        #if len(func) > 0:
+        #    functions[0] = getPoints(Initialize(list(''.join(func).split(" "))),round(WIDTH*0.75))
+
     '''
         funcs = funcList.equations[:]
         for i in range(len(funcs)):
             temp = Initialize(list(''.join(funcs[i]).split(" ")))
             if len(temp) > 0:
                 functions[i] = getPoints(temp,round(WIDTH*0.75))
-        '''
+    '''
     #print(funcList.equations)
     redrawWin()
     for event in pygame.event.get():
@@ -126,7 +133,6 @@ while Use:
         if event.key == pygame.K_DOWN:
             grid.vTranslation += 70
         '''
-
         if event.type == pygame.MOUSEBUTTONDOWN:
             mp = pygame.mouse.get_pos()
             if 0.25 * WIDTH < mp[0] < WIDTH and mp[1] < 0.8*HEIGHT:
