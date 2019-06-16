@@ -6,6 +6,16 @@
 # Given eight inputboxes to define variables or create functions
 #--------------------------------------------------------------------------------
 
+# To-do:
+# - Make and output box(s) for all errors to go
+# - Make sure you cannot enter invalid characters into the equation.
+# - Capitals/lower case shouldnt matter.
+# - More error support (multiple '=', starting/ending with operation, etc).
+# - Make dictionary of custom user-created variables
+# - Line intersection points that you can click to toggle the label visibility
+# - Error that doesn't allow more than one of the same user variable like a=1,a=2. What does 'a' equal then?
+
+
 from grid_class import *
 from GUI_class import *
 from pygrid import *
@@ -32,9 +42,9 @@ def getPoints(e,width,scale):
             if x == -width//2:
                 p.append(None)
         else:
-            #If too big or small, set a limit. y//abs(y) gets the sign (+,-)
-            if y >= 10**10 or y <= -10**10:
-                y = y//abs(y)*10**10
+            #If too big or small, set a limit. Won't work if too big
+            if y >= 10**8 or y <= -(10**8):
+                y = y//abs(y)*(10**8)
             #Add the point to a list
             else:
                 p.append((x,y))
@@ -79,6 +89,13 @@ def redrawWin():
     pygame.draw.line(screen,(97,178,66),(0,0.8*HEIGHT+2),(WIDTH,0.8*HEIGHT+2),3)
     pygame.display.update()
 
+def getFunctions():
+    funcs = []
+    for f in funcList.equations:
+        funcs.append(list(f))
+    funcs = [Initialize(f) for f in funcs if len(f) > 0]
+    return [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
+
 # keyboard grids
 grid = CalcGrid(70,70)
 funcList = functionList((1,60,0.25*WIDTH-5,0.8*HEIGHT-60),8,1,1,1,('monospace',16))
@@ -97,18 +114,10 @@ tick = 0
 # graph translation
 Use = True
 while Use:
-    pygame.time.delay(50)
-    if tick % 20 == 0:
-        funcs = []
-        for f in funcList.equations:
-            funcs.append(list(f))
-        #print(funcs)
-        funcs = [Initialize(f) for f in funcs if len(f) > 0]
-        #print("F:",funcs)
-        functions = [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
-        #if len(func) > 0:
-        #    functions[0] = getPoints(Initialize(list(''.join(func).split(" "))),round(WIDTH*0.75))
-
+    pygame.time.delay(20)
+    #every half a second or so, the equations are tested for mistakes and added to the functions if they make sense
+    if tick % 25 == 0:
+        functions = getFunctions()
     '''
         funcs = funcList.equations[:]
         for i in range(len(funcs)):
@@ -141,8 +150,10 @@ while Use:
             if 0.25 * WIDTH < mp[0] < WIDTH and mp[1] < 0.8*HEIGHT:
                 if event.button == 4:
                     grid.zoom('in')
+                    functions = getFunctions()
                 if event.button == 5:
                     grid.zoom('out')
+                    functions = getFunctions()
             if event.button == 1:
                 funcList.selectFunc(funcList.mouseOverCell(mp[0],mp[1]))
                 if keypad.mouseOverCell(mp[0],mp[1]) != None:
