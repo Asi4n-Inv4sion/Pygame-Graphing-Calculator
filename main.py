@@ -15,7 +15,6 @@
 # - Line intersection points that you can click to toggle the label visibility
 # - Error that doesn't allow more than one of the same user variable like a=1,a=2. What does 'a' equal then?
 
-
 from grid_class import *
 from GUI_class import *
 from pygrid import *
@@ -37,7 +36,7 @@ def getPoints(e,width,scale):
         if y != None:
             y *= 70/scale
         #If the equation has division by 0 at a point, use None as a point
-        if y == None:
+        if type(y) != float and type(y) != int:
             p.append(None)
             if x == -width//2:
                 p.append(None)
@@ -115,16 +114,10 @@ tick = 0
 Use = True
 while Use:
     pygame.time.delay(20)
-    #every half a second or so, the equations are tested for mistakes and added to the functions if they make sense
-    if tick % 25 == 0:
+    #every half a second or so, the equations are tested for mistakes and added to the functions list if they make sense
+    if tick % 20 == 0:
+        customVars.clear()#resets customVars in case they were deleted
         functions = getFunctions()
-    '''
-        funcs = funcList.equations[:]
-        for i in range(len(funcs)):
-            temp = Initialize(list(''.join(funcs[i]).split(" ")))
-            if len(temp) > 0:
-                functions[i] = getPoints(temp,round(WIDTH*0.75))
-    '''
     #print(funcList.equations)
     redrawWin()
     for event in pygame.event.get():
