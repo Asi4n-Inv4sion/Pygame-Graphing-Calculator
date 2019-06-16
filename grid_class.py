@@ -1,4 +1,9 @@
-# Pygame grid class for graphing calculator
+#--------------------------------------------------------------------------------
+# Grid Class for Pygame Graph Calculator (Pymos)
+# Leo Wang
+# Draws the grid for graphs to be drawn on
+# Zoomable by multiplication intervals of 2,2.5,2
+#--------------------------------------------------------------------------------
 import pygame, math
 from abc import ABCMeta, abstractmethod
 from float_rounder import *
