@@ -11,7 +11,7 @@
 # - Changable line types, dotted, actual dots (circles), or full line
 
 import math
-radOrDeg = "deg"
+radOrDeg = "rad"
 operators = ["+","-","*","/","^",".","sin","cos","tan","sqrt"]
 conversions = ["sin","cos","tan","sqrt"]
 isError = True
@@ -126,6 +126,8 @@ def Postfix(e,i,opstack,output):
     #Sorts the equation into a format easy to calculate with, more info in link below
     #https://interactivepython.org/runestone/static/pythonds/BasicDS/InfixPrefixandPostfixExpressions.html
     priority = {"^":3,"*":2,"/":2,"-":1,"+":1}
+    if e == None:
+        return None
     while i < len(e):
         if type(e[i]) is list:
             temp = Postfix(e[i],0,[],[])
@@ -187,8 +189,10 @@ def PreCalc(e,i,xVal=None,customVars={}):
                     e[i] = round(math.tan(e[i+1]),10)
                     del e[i+1]
             elif e[i].lower() == "sqrt":
-                e[i] = math.sqrt(e[i+1])
-                del e[i+1]
+                if e[i+1] >= 0:
+                    e[i] = math.sqrt(e[i+1])
+                    del e[i+1]
+                else: return None
         i += 1
     return e
 
@@ -211,7 +215,9 @@ def Calc(a,b,op):
 def Calculate(e,temp,i,x):
     f = Postfix(PreCalc(e,0,x),0,[],[])
     #Uses a pre-sorted bedmas-friendly format to calculate with called "Postfix notation"
-    if len(f) == 0:
+    if f == None:
+        return None
+    elif len(f) == 0:
         return None
     else:
         while i < len(f):
