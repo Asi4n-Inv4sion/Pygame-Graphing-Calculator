@@ -19,6 +19,7 @@ class functionList(Grid):
         for i in range(rows):
             self.equations.append('')
 
+    # adds symbols into the selected function
     def equationAppend(self,symbol):
         if symbol != None and self.selectedFunction != None and len(self.equations[self.selectedFunction]) < 30:
             if symbol == '÷':
@@ -34,13 +35,11 @@ class functionList(Grid):
                     self.equations[self.selectedFunction] += symbol
             elif symbol != '←':
                 self.equations[self.selectedFunction] += symbol
-
-
+        # backspace symbol
         if symbol == '←' and self.selectedFunction != None:
             self.equations[self.selectedFunction] = self.equations[self.selectedFunction][:-1]
-        '''if symbol != None and self.selectedFunction != None:
-            print(self.equations[self.selectedFunction])'''
 
+    # support for most keystrokes
     def equationKeyPress(self,key):
         if key == pygame.K_BACKSPACE:
             self.equationAppend('←')
@@ -51,10 +50,12 @@ class functionList(Grid):
             self.equationAppend(pygame.key.name(key))
         self.updateFunctions()
 
+    # select a function by which cell it resides in
     def selectFunc(self,cell):
         if cell != None:
             self.selectedFunction = cell
 
+    # update the text to show the equations
     def updateFunctions(self):
         self.text = self.equations[:]
 
