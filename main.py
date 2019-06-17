@@ -115,7 +115,7 @@ Use = True
 while Use:
     pygame.time.delay(20)
     #every half a second or so, the equations are tested for mistakes and added to the functions list if they make sense
-    if tick % 20 == 0:
+    if tick % 15 == 0:
         del verticals[:] #resets vertical lines
         customVars.clear()#resets customVars in case they were deleted
         functions = getFunctions() #gets the points for each function
