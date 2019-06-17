@@ -6,25 +6,27 @@
 #--------------------------------------------------------------------------------
 
 import math
-radOrDeg = "rad"
-operators = ["+","-","*","/","^",".","sin","cos","tan","sqrt"]
+radOrDeg = "rad"#radians or degrees variable
+operators = ["+","-","*","/","^",".","sin","cos","tan","sqrt"]#possible operators allowed
+#possible variable options the user can use to create their own variable.
 possibleVars = ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','z']
 conversions = ["sin","cos","tan","sqrt"]
 isError = True
-customVars = {}
-verticals = []
+customVars = {}#Stores the custom user variables and their value
+verticals = []#Stores vertical lines
 
-#Replaces a list with one element, with that element. The list was pointless
 def RemoveExtraBrackets(n):
-    if type(n) is list and maxRecur > 0:
+    #keeps removing extra sets of brackets within each other. 2*(((x+1))) will turn into 2*(x+1)
+    if type(n) is list:#and maxRecur > 0
         return RemoveExtraBrackets(n)
+    #replaces a list with one element, with that one element. The list is technically pointless
     elif type(n) is float or type(n) is int or n == "x":
         return n
     return n
 
 def Setup_1(e,i):
     global customVars
-    #Checking if the equation ends with an operator which doesn't make sense
+    #Checking if the equation ends with any operator which doesn't make sense
     if e[0] in ["+","*","/","^","."] or e[-1] in operators: return None
     elif len(e) >= 3 and ''.join(e[-3:]) in operators: return None
     elif len(e) >= 4 and ''.join(e[-4:]) in operators: return None
@@ -32,7 +34,7 @@ def Setup_1(e,i):
     if len([n for n in e if n == "="]) > 1:
         return None
     while i < len(e):
-        #initialize areas with brackets
+        #initialize areas with brackets first
         if e[i] == "(":
             b = 1 #counting unfinished begin/end bracket pairs
             #once an equal amount of begin/end brackets are found, that area is intialized
@@ -67,15 +69,17 @@ def Setup_2(e,i):
     #combines consecutive integers into one [1,2] --> [12]
     while i < len(e):
         if type(e[i]) is int and type(e[i-1]) is int:
+            #combines two and deletes the other
             e[i-1] = int("".join([str(c) for c in e[i-1:i+1]]))
             del e[i]
         else: i += 1
     return e
 
 def Setup_3(e,i):
-    #combines integers with a decimal between them into a float [1,'.',2] --> [1.2]
+    #combines integers with a decimal between them into a float [1,'.',22] --> [1.22]
     while i < len(e):
         if type(e[i]) is int and e[i-1] == "." and type(e[i-2]) is int:
+            #adds one plus other/10**len for it to be the correct decimal place
             e[i-2] = e[i-2]+(e[i]/10**len(str(e[i])))
             del e[i-1:i+1]
         else: i += 1
@@ -100,31 +104,39 @@ def Setup_4(e,i):
         i += 1
     return e
 
+#[-,x,^,2,+,1]         [-1,*,x,^,2,+,1]
+
+#[1,-,x,^,2,+,1]  [1,+,-1,*,x,^,2,+,1]
+
 def Setup_5(e,i):
     global customVars,possibleVars
     #removes extra '+', changes subtracton to addition of a negative, and also changes 2 '-' to '+'
     while i < len(e)-1:
+        #Changes subtrauction to addition of negative for numbers
         if e[i] == "-" and (type(e[i+1]) is int or type(e[i+1]) is float):
             e[i] = "+"
             e[i+1] = -e[i+1]
-        elif e[i] == "-" and (e[i+1] == "x" or type(e[i+1]) is list):
+        #If there's no number, it multiplies by negative 1
+        elif e[i] == "-" and (e[i+1] == "x" or type(e[i+1]) is list or e[i+1] in conversions):
             if i > 0:
                 e[i] = "+"
                 e.insert(i+1,"*")
                 e.insert(i+1,-1)
-                i += 1
+                i += 2
             else:
                 del e[i]
                 e.insert(i,"*")
                 e.insert(i,-1)
+                i += 1
             i += 1
+        #changes 2 consecutive subtraction into addition
         elif e[i] == "-" and e[i+1] == "-":
             e[i] = "+"
             del e[i+1]
+        #deletes extra addition symbols
         if e[i] == "+" and e[i+1] == "+":
             del e[i+1]
         i += 1
-    print(e)
     #detects the user trying to create a custom variable and adds it to the dictionary customVars. "y" and "e" aren't included as they are used elsewhere
     if len(e) == 3: #Case 1, adding a positive number
         if e[1] == "=" and e[0] in possibleVars and (type(e[2]) is int or type(e[2]) is float or e[2] in possibleVars):
@@ -148,6 +160,7 @@ def Setup_5(e,i):
 
 #Prepares the inputted equation to calculate
 def Initialize(e):
+    #Runs each setup step, more info in their corresponding functions above
     e = Setup_1(e,0)
     if e == None: return None
     e = Setup_2(e,1)
@@ -175,6 +188,14 @@ def Postfix(e,i,opstack,output):
                 output.append(opstack[-1])
                 del opstack[-1]
             opstack.append(e[i])
+            
+            #new stuff------------------------------------------------------------
+            if len(opstack) >= 2:
+                if priority[opstack[-1]] < priority[opstack[-2]]:
+                    output.append(opstack[-2])
+                    del opstack[-2]
+            #new stuff--------------------------------------------------
+
         i += 1
     for op in reversed(opstack):
         output.append(op)
@@ -199,36 +220,42 @@ def PreCalc(e,i,radOrDeg,xVal=None):
     #Pre-calculates all "conversion" operations like sine leaving only basic ones like adding
     while i < len(e)-1:
         if e[i] in conversions:
-            if e[i].lower() == "sin":
-                if radOrDeg == "deg":
-                    e[i] = round(math.sin(math.radians(e[i+1])),10)
-                    del e[i+1]
-                elif radOrDeg == "rad":
-                    e[i] = round(math.sin(e[i+1]),10)
-                    del e[i+1]
-            elif e[i].lower() == "cos":
-                if radOrDeg == "deg":
-                    e[i] = round(math.cos(math.radians(e[i+1])),10)
-                    del e[i+1]
-                elif radOrDeg == "rad":
-                    e[i] = round(math.cos(e[i+1]),10)
-                    del e[i+1]
-            elif e[i].lower() == "tan":
-                if radOrDeg == "deg":
-                    e[i] = round(math.tan(math.radians(e[i+1])),10)
-                    del e[i+1]
-                elif radOrDeg == "rad":
-                    e[i] = round(math.tan(e[i+1]),10)
-                    del e[i+1]
-            elif e[i].lower() == "sqrt":
-                if e[i+1] >= 0:
-                    e[i] = math.sqrt(e[i+1])
-                    del e[i+1]
-                else: return None
+            if type(e[i+1]) in [int,float]:
+                #calculates sine
+                if e[i].lower() == "sin":
+                    if radOrDeg == "deg":
+                        e[i] = round(math.sin(math.radians(e[i+1])),10)
+                        del e[i+1]
+                    elif radOrDeg == "rad":
+                        e[i] = round(math.sin(e[i+1]),10)
+                        del e[i+1]
+                #calculates cosine
+                elif e[i].lower() == "cos":
+                    if radOrDeg == "deg":
+                        e[i] = round(math.cos(math.radians(e[i+1])),10)
+                        del e[i+1]
+                    elif radOrDeg == "rad":
+                        e[i] = round(math.cos(e[i+1]),10)
+                        del e[i+1]
+                #calculates tangent
+                elif e[i].lower() == "tan":
+                    if radOrDeg == "deg":
+                        e[i] = round(math.tan(math.radians(e[i+1])),10)
+                        del e[i+1]
+                    elif radOrDeg == "rad":
+                        e[i] = round(math.tan(e[i+1]),10)
+                        del e[i+1]
+                #calculates square root
+                elif e[i].lower() == "sqrt":
+                    if type(e[i+1]) in [int,float] and e[i+1] >= 0:
+                        e[i] = math.sqrt(e[i+1])
+                        del e[i+1]
+                    else: return None
+            else: return None
         i += 1
     return e
 
-#Deals with the basic operations between 2 numbers
+#Deals with the basic operations between 2 numbers, called by Calculate
 def Calc(a,b,op):
     if op == "+":
         return (a + b)
@@ -254,6 +281,7 @@ def Calculate(e,temp,i,x,radOrDeg):
     elif len(f) == 0:
         return None
     else:
+        #Calculates every operation between 2 terms
         while i < len(f):
             if type(f[i]) is int or type(f[i]) is float:
                 temp.append(f[i])
@@ -263,5 +291,4 @@ def Calculate(e,temp,i,x,radOrDeg):
                 del temp[-3:-1]
             i += 1
         return temp[0]
-
-#equation = Initialize(list(''.join(input("Enter equation: y = ").split(" "))))
+    return None
