@@ -2,7 +2,7 @@
 # Graphing Calculator for Pygame
 # Julian and Leo
 # User can input functions using the printed buttons or using their keyboard
-# for most functions
+# for most symbols
 # Given eight inputboxes to define variables or create functions
 #--------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ def drawFunction(p,xcord,ycord,width,height):
 #Draws any vertical lines passed
 def drawVertical(v,xcord,ycord,width,height,scale):
     pygame.draw.line(screen,(200,0,200),(xcord+width//2+v*70/scale,ycord),(xcord+width//2+v*70/scale,ycord+height),3)
-        
+
 def redrawWin():
     global functions,verticals
     screen.fill((255,255,255))
@@ -83,6 +83,7 @@ def redrawWin():
 
     #Drawing extra GUI
     screen.blit(pymos,(6,6))
+    printText('Sowsep™',pygame.font.SysFont('consolas',40),screen,150,33)
     funcList.highlightSelectedCell(screen)
     angleMode.highlightCells(screen,[angleMode.text.index(radOrDeg)],(30,30,30))
     pygame.draw.line(screen,(97,178,66),(0.25*WIDTH-2,0),(0.25*WIDTH-2,0.8*HEIGHT),3)
@@ -98,6 +99,26 @@ def getFunctions():
     funcs = [Initialize(f) for f in funcs if len(f) > 0]
     return [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
 
+def fileFunc(f,mode):
+    if mode == 'save':
+        funcfile = open(f,'w')
+        funcfile.writelines('\n'.join(funcList.equations))
+        funcfile.close()
+    elif mode == 'load':
+        funcfile = open(f,'r')
+        funcList.equations = [line.strip() for line in funcfile.readlines()]
+        funcfile.close()
+    elif mode == 'delete':
+        funcfile = open(f,'w')
+        funcfile.writelines('')
+        funcfile.close()
+
+def printText(text, font, canvas, x, y):
+    theText = font.render(text, 1, (0,0,0))
+    textbox = theText.get_rect()
+    textbox.center = (x, y)
+    canvas.blit(theText, textbox)
+
 # keyboard grids
 grid = CalcGrid(70,70)
 funcList = functionList((1,60,0.25*WIDTH-5,0.8*HEIGHT-60),8,1,1,1,('monospace',16))
@@ -108,7 +129,8 @@ expofunc = Grid((WIDTH//2-0.17*WIDTH,0.8*HEIGHT+5,0.07*WIDTH,0.2*HEIGHT-5),4,1,1
 miscfunc = Grid((WIDTH//2-0.24*WIDTH,0.8*HEIGHT+5,0.07*WIDTH,0.2*HEIGHT-5),4,1,1,2,('monospace',18),(0,0,0),['(',')','x','y'],True)
 variables = Grid((3,0.8*HEIGHT+5,0.25*WIDTH,0.2*HEIGHT-5),4,6,1,2,('monospace',18),(0,0,0),['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','z'],True)
 angleMode = Grid((WIDTH//2+0.22*WIDTH,0.8*HEIGHT+5,0.1*WIDTH,0.05*HEIGHT-2),1,2,1,2,('monospace',18),(0,0,0),['deg','rad'],True)
-keyboard = [keypad,operationpad,trigfunc,expofunc,miscfunc,variables,angleMode]
+filebuttons = Grid((WIDTH//2+0.22*WIDTH,0.85*HEIGHT+2,0.2*WIDTH,0.15*HEIGHT-2),3,1,1,2,('monospace',18),(0,0,0),['Save Functions','Load Functions','Delete Saved Functions'],True)
+keyboard = [keypad,operationpad,trigfunc,expofunc,miscfunc,variables,angleMode,filebuttons]
 
 tick = 0
 Use = True
@@ -165,6 +187,14 @@ while Use:
                     funcList.selectedFunction = None
                 if angleMode.mouseOverCell(mp[0],mp[1]) != None:
                     radOrDeg = angleMode.text[angleMode.mouseOverCell(mp[0],mp[1])]
+                if filebuttons.mouseOverCell(mp[0],mp[1]) != None:
+                    if filebuttons.mouseOverCell(mp[0],mp[1]) == 0:
+                        fileFunc('saved_functions.txt','save')
+                    elif filebuttons.mouseOverCell(mp[0],mp[1]) == 1:
+                        fileFunc('saved_functions.txt','load')
+                    elif filebuttons.mouseOverCell(mp[0],mp[1]) == 2:
+                        fileFunc('saved_functions.txt','delete')
+
                 funcList.updateFunctions()
     tick += 1
 pygame.quit()
