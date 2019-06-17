@@ -74,14 +74,6 @@ def redrawWin():
     for f in keyboard:
         f.drawGrid(screen,(0,0,0))
 
-    """
-    keypad.drawGrid(screen,(0,0,0))
-    operationpad.drawGrid(screen,(0,0,0))
-    trigfunc.drawGrid(screen,(0,0,0))
-    expofunc.drawGrid(screen,(0,0,0))
-    miscfunc.drawGrid(screen,(0,0,0))
-    variables.drawGrid(screen,(0,0,0))"""
-
     #Drawing extra GUI
     screen.blit(pymos,(6,6))
     printText('Sowsep™',pygame.font.SysFont('consolas',40),screen,150,33)
