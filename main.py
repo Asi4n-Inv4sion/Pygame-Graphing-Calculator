@@ -55,6 +55,12 @@ def drawFunction(p,xcord,ycord,width,height,colour):
 def drawVertical(v,xcord,ycord,width,height,scale):
     pygame.draw.line(screen,(200,0,200),(xcord+width//2+v*70/scale,ycord),(xcord+width//2+v*70/scale,ycord+height),3)
 
+# labels the colour of a box to correspond to the colour of the function
+def drawFuncColours(screen,x,y,colours,boxesUsed):
+    for i in range(len(colours)):
+        if i in boxesUsed:
+            pygame.draw.circle(screen,colours[i],(x,y+64*i),5)
+
 def redrawWin():
     global functions,verticals
     screen.fill((255,255,255))
@@ -76,6 +82,7 @@ def redrawWin():
 
     #Drawing extra GUI
     screen.blit(pymos,(6,6))
+    drawFuncColours(screen,300,73,funcList.colours,boxesUsed)
     printText('Sowsep™',pygame.font.SysFont('consolas',40),screen,150,33)
     funcList.highlightSelectedCell(screen)
     angleMode.highlightCells(screen,[angleMode.text.index(radOrDeg)],(30,30,30))
@@ -93,6 +100,7 @@ def getFunctions():
     funcs = [Initialize(f) for f in funcs if len(f) > 0]
     return [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
 
+# saves, loads, or deleted functions from a text file
 def fileFunc(f,mode):
     if mode == 'save':
         funcfile = open(f,'w')
