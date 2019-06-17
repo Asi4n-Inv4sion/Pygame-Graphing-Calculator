@@ -21,6 +21,7 @@ screen = pygame.display.set_mode((WIDTH,HEIGHT))
 functions = []
 radOrDeg = "rad"
 boxesUsed = []
+colours = []
 
 def getPoints(e,width,scale):
     p = []
@@ -45,10 +46,10 @@ def getPoints(e,width,scale):
                     p.append((x,y))
     return p
 
-def drawFunction(p,xcord,ycord,width,height):
+def drawFunction(p,xcord,ycord,width,height,colour):
     for i in range(len(p)-1):
         if p[i] != None and p[i+1] != None:
-            pygame.draw.line(screen,(0,0,255),(xcord+width/2+p[i][0],ycord+height/2-p[i][1]),(xcord+width/2+p[i+1][0],ycord+height/2-p[i+1][1]),3)
+            pygame.draw.line(screen,colour,(xcord+width/2+p[i][0],round(ycord+height/2-p[i][1])),(xcord+width/2+p[i+1][0],round(ycord+height/2-p[i+1][1])),3)
 
 #Draws any vertical lines passed
 def drawVertical(v,xcord,ycord,width,height,scale):
@@ -62,7 +63,7 @@ def redrawWin():
 
     #Draws function(s)
     for f in range(len(functions)):
-        drawFunction(functions[f],round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8))
+        drawFunction(functions[f],round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8),colours[f])
     for v in verticals:
         drawVertical(v,round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8),grid.scale)
     pygame.draw.rect(screen,(255,255,255),(WIDTH*0.25,HEIGHT*0.8,WIDTH*0.75,HEIGHT*0.2))#Covers up the function if it exits the graph
@@ -91,11 +92,12 @@ def redrawWin():
     pygame.display.update()
 
 def getFunctions():
-    global boxesUsed
+    global boxesUsed,colours
     funcs = []
     for f in funcList.equations:
         funcs.append(list(f))
     boxesUsed = [i for i,f in enumerate(funcs) if len(f) > 0]
+    colours = [funcList.colours[i] for i in boxesUsed]
     funcs = [Initialize(f) for f in funcs if len(f) > 0]
     return [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
 
