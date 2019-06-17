@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------
-# Grid Class for Pygame Graph Calculator (Pymos)
+# Grid Class for Pygame Graph Calculator
 # Leo Wang
 # Draws the grid for graphs to be drawn on
 # Zoomable by multiplication intervals of 2,2.5,2
@@ -31,8 +31,6 @@ class CalcGrid(object):
         self.scale = 1
         self.multiplierSequenceList = [2,2.5,2]
         self.currentMultiplierIndex = 0
-        self.hTranslation = 0
-        self.vTranslation = 0
 
     @staticmethod
     def printText(text, font, canvas, x, y):
@@ -61,7 +59,7 @@ class CalcGrid(object):
         background = pygame.draw.rect(canvas,(255,255,255),backgroundRect)
         canvas.blit(theText, textbox)
 
-    # draws the grid and text
+    # draws the grid and text, much is brute forced because the order is important for the look
     def drawGrid(self,screen,sizex,sizey,tx,ty):
         '''
         sizex: the width of the displayed graph in pixels
@@ -185,29 +183,3 @@ class CalcGrid(object):
             self.currentMultiplierIndex = 2
         elif self.currentMultiplierIndex == 3:
             self.currentMultiplierIndex = 0
-
-'''def redrawWin():
-    screen.fill((255,255,255))
-    grid.drawGrid(screen,1096,600,270,0)
-
-    pygame.display.update()
-
-
-screen = pygame.display.set_mode((1366,768),pygame.FULLSCREEN)
-grid = Grid(70,70)
-Use = True
-while Use:
-    pygame.time.delay(10)
-    redrawWin()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            Use = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                Use = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 4:
-                grid.zoom('in')
-            if event.button == 5:
-                grid.zoom('out')
-pygame.quit()'''
