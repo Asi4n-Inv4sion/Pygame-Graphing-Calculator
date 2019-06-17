@@ -101,10 +101,11 @@ funcList = functionList((1,60,0.25*WIDTH-5,0.8*HEIGHT-60),8,1,1,1,('monospace',1
 keypad = Grid((WIDTH//2-0.1*WIDTH,0.8*HEIGHT+5,0.2*WIDTH,0.2*HEIGHT-5),4,3,1,2,('monospace',18),(0,0,0),['7','8','9','4','5','6','1','2','3','0','.','='],True)
 operationpad = Grid((WIDTH//2+0.1*WIDTH,0.8*HEIGHT+5,0.05*WIDTH,0.2*HEIGHT-5),4,1,1,2,('monospace',18),(0,0,0),['+','-','*','÷'],True)
 trigfunc = Grid((WIDTH//2+0.15*WIDTH,0.8*HEIGHT+5,0.07*WIDTH,0.2*HEIGHT-5),4,1,1,2,('monospace',18),(0,0,0),['sin','cos','tan','←'],True)
-expofunc = Grid((WIDTH//2-0.17*WIDTH,0.8*HEIGHT+5,0.07*WIDTH,0.2*HEIGHT-5),4,1,1,2,('monospace',18),(0,0,0),['a^2','a^3','a^b','√a'],True)
+expofunc = Grid((WIDTH//2-0.17*WIDTH,0.8*HEIGHT+5,0.07*WIDTH,0.2*HEIGHT-5),4,1,1,2,('monospace',18),(0,0,0),['a^2','a^b','√a','π'],True)
 miscfunc = Grid((WIDTH//2-0.24*WIDTH,0.8*HEIGHT+5,0.07*WIDTH,0.2*HEIGHT-5),4,1,1,2,('monospace',18),(0,0,0),['(',')','x','y'],True)
 variables = Grid((3,0.8*HEIGHT+5,0.25*WIDTH,0.2*HEIGHT-5),4,6,1,2,('monospace',18),(0,0,0),['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','z'],True)
-keyboard = [keypad,operationpad,trigfunc,expofunc,miscfunc,variables]
+angleMode = Grid((WIDTH//2+0.22*WIDTH,0.8*HEIGHT+5,0.1*WIDTH,0.05*HEIGHT-2),1,2,1,2,('monospace',18),(0,0,0),['deg','rad'],True)
+keyboard = [keypad,operationpad,trigfunc,expofunc,miscfunc,variables,angleMode]
 
 #funcList.equations[0] = 'x'
 #funcList.updateFunctions()
@@ -164,5 +165,9 @@ while Use:
                 elif funcList.mouseOverCell(mp[0],mp[1]) == None:
                     funcList.selectedFunction = None
                 funcList.updateFunctions()
+
+                if angleMode.mouseOverCell(mp[0],mp[1]) != None:
+                    radOrDeg = angleMode.text[angleMode.mouseOverCell(mp[0],mp[1])]
+                    print(radOrDeg)
     tick += 1
 pygame.quit()
