@@ -5,22 +5,14 @@
 # Also calculates analyzed equations to graph with
 #--------------------------------------------------------------------------------
 
-# To-do:
-# - Make and output box(s) for all errors to go
-# - Make sure you cannot enter invalid characters into the equation.
-# - Capitals/lower case shouldnt matter.
-# - More error support (multiple '=', starting/ending with operation, etc).
-# - Make dictionary of custom user-created variables
-# - Line intersection points that you can click to toggle the label visibility
-# - Error that doesn't allow more than one of the same user variable like a=1,a=2. What does 'a' equal then?
-
-
 import math
 radOrDeg = "rad"
 operators = ["+","-","*","/","^",".","sin","cos","tan","sqrt"]
+possibleVars = ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','z']
 conversions = ["sin","cos","tan","sqrt"]
 isError = True
 customVars = {}
+verticals = []
 
 #Replaces a list with one element, with that element. The list was pointless
 def RemoveExtraBrackets(n):
@@ -32,8 +24,6 @@ def RemoveExtraBrackets(n):
 
 def Setup_1(e,i):
     global customVars
-    if len(e) > 1 and e[0] == "y" and e[1] == "=":
-        del e[0:2]
     #Checking if the equation ends with an operator which doesn't make sense
     if e[0] in ["+","*","/","^","."] or e[-1] in operators: return None
     elif len(e) >= 3 and ''.join(e[-3:]) in operators: return None
@@ -68,6 +58,9 @@ def Setup_1(e,i):
         i += 1
     while len(e) == 1 and type(e[0]) is list:
         e = e[0]
+    #removes "y=" since it technically isn't needed
+    if len(e) > 1 and e[0] == "y" and e[1] == "=":
+        del e[0:2]
     return e
         
 def Setup_2(e,i):
@@ -107,18 +100,14 @@ def Setup_4(e,i):
         i += 1
     return e
 
-# [-,[x+1],-,77]
-
-# [-1,*,[x+1],-,77]
-
 def Setup_5(e,i):
-    global customVars
+    global customVars,possibleVars
     #removes extra '+', changes subtracton to addition of a negative, and also changes 2 '-' to '+'
     while i < len(e)-1:
         if e[i] == "-" and (type(e[i+1]) is int or type(e[i+1]) is float):
             e[i] = "+"
             e[i+1] = -e[i+1]
-        elif e[i] == "-" and e[i+1] == "x":
+        elif e[i] == "-" and (e[i+1] == "x" or type(e[i+1]) is list):
             if i > 0:
                 e[i] = "+"
                 e.insert(i+1,"*")
@@ -135,12 +124,25 @@ def Setup_5(e,i):
         if e[i] == "+" and e[i+1] == "+":
             del e[i+1]
         i += 1
-    if len(e) == 3:
-        #detects the user trying to create a custom variable and adds it to the dictionary customVars. "e" isn't included as its used for Euler's number
-        if e[1] == "=" and e[0] in ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'] and (type(e[2]) is int or type(e[2]) is float or e[2] in ['a','b','c','d','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']):
-            customVars[e[0]] = e[2]
+    print(e)
+    #detects the user trying to create a custom variable and adds it to the dictionary customVars. "y" and "e" aren't included as they are used elsewhere
+    if len(e) == 3: #Case 1, adding a positive number
+        if e[1] == "=" and e[0] in possibleVars and (type(e[2]) is int or type(e[2]) is float or e[2] in possibleVars):
+            if e[0].lower() == "x":
+                verticals.append(e[2])
+            elif e[0] not in customVars: #doesn't allow two of the same variable
+                customVars[e[0]] = e[2]
+            else: return None
+    elif len(e) == 4: #Case 2, adding negative number
+        if e[1] == "=" and e[0] in possibleVars and e[2] == "+" and (type(e[3]) is int or type(e[3]) is float or e[3] in possibleVars):
+            if e[0].lower() == "x":
+                verticals.append(e[3])
+            elif e[0] not in customVars: #doesn't allow two of the same variable
+                customVars[e[0]] = e[3]
+            else: return None
+    #If there is an unknown variable, don't do anything
     for n in range(len(e)):
-        if type(e[n]) is str and e[n] not in operators and e[n] not in customVars and e[n] not in ['x','y','e']:
+        if type(e[n]) is str and e[n] not in operators and e[n] not in customVars and e[n] not in ['x','y','e','π']:
             return None
     return e
 
@@ -180,12 +182,11 @@ def Postfix(e,i,opstack,output):
 
 #-------------------------------------------------- CALCULATIONS ------------------------------------------------------------
 
-def PreCalc(e,i,xVal=None):
-    global radOrDeg
+def PreCalc(e,i,radOrDeg,xVal=None):
     for n in range(len(e)):
         #If there is a list, repeat the process within it
         if type(e[n]) is list:
-            e[n] = Calculate(e[n][:],[],0,xVal)#Calculate inner lists
+            e[n] = Calculate(e[n][:],[],0,xVal,radOrDeg)#Calculate inner lists
         #Change all x's to the current x value
         elif e[n] == "x" and (type(xVal) is int or type(xVal) is float):
             e[n] = xVal
@@ -236,15 +237,17 @@ def Calc(a,b,op):
     elif op == "*":
         return (a * b)
     elif op == "^":
-        return (a ** b)
+        try: (a ** b)
+        except OverflowError: return None
+        else: return (a ** b)
     elif op == "/":
         if b == 0:
             return None
         else:
             return (a / b)
 
-def Calculate(e,temp,i,x):
-    f = Postfix(PreCalc(e,0,x),0,[],[])
+def Calculate(e,temp,i,x,radOrDeg):
+    f = Postfix(PreCalc(e,0,radOrDeg,x),0,[],[])
     #Uses a pre-sorted bedmas-friendly format to calculate with called "Postfix notation"
     if f == None:
         return None
