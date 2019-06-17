@@ -15,6 +15,7 @@ class functionList(Grid):
         Grid.__init__(self,rect,rows,columns,outline,gap,font,font_colour,text,visible)
         self.equations = []
         self.selectedFunction = None
+        self.colours = [(255,0,0),(255,127,0),(255,255,0),(0,255,0),(108,180,238),(0,0,255),(75,0,130),(148,0,211)]
         for i in range(rows):
             self.equations.append('')
 
@@ -24,8 +25,6 @@ class functionList(Grid):
                 self.equations[self.selectedFunction] += '/'
             elif symbol == 'a^2' and len(self.equations[self.selectedFunction]) < 29:
                 self.equations[self.selectedFunction] += '^2'
-            elif symbol == 'a^3' and len(self.equations[self.selectedFunction]) < 29:
-                self.equations[self.selectedFunction] += '^3'
             elif symbol == 'a^b' and len(self.equations[self.selectedFunction]) < 29:
                 self.equations[self.selectedFunction] += '^('
             elif symbol == '√a' and len(self.equations[self.selectedFunction]) < 26:
@@ -39,8 +38,8 @@ class functionList(Grid):
 
         if symbol == '←' and self.selectedFunction != None:
             self.equations[self.selectedFunction] = self.equations[self.selectedFunction][:-1]
-        if symbol != None and self.selectedFunction != None:
-            print(self.equations[self.selectedFunction])
+        '''if symbol != None and self.selectedFunction != None:
+            print(self.equations[self.selectedFunction])'''
 
     def equationKeyPress(self,key):
         if key == pygame.K_BACKSPACE:
