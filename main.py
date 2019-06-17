@@ -6,15 +6,6 @@
 # Given eight inputboxes to define variables or create functions
 #--------------------------------------------------------------------------------
 
-# To-do:
-# - Make and output box(s) for all errors to go
-# - Make sure you cannot enter invalid characters into the equation.
-# - Capitals/lower case shouldnt matter.
-# - More error support (multiple '=', starting/ending with operation, etc).
-# - Make dictionary of custom user-created variables
-# - Line intersection points that you can click to toggle the label visibility
-# - Error that doesn't allow more than one of the same user variable like a=1,a=2. What does 'a' equal then?
-
 from grid_class import *
 from GUI_class import *
 from pygrid import *
@@ -28,13 +19,16 @@ HEIGHT = 720
 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 functions = []
+radOrDeg = "rad"
+boxesUsed = []
 
 def getPoints(e,width,scale):
     p = []
     for x in range(-width//2,width//2):#equation variable changes depending on the graph being drawn
-        y = Calculate(e[:],[],0,x/70*scale)
+        y = Calculate(e[:],[],0,x/70*scale,radOrDeg)
         if y != None:
             y *= 70/scale
+
         #If the equation has division by 0 at a point, use None as a point
         if type(y) != float and type(y) != int:
             p.append(None)
@@ -51,14 +45,17 @@ def getPoints(e,width,scale):
                     p.append((x,y))
     return p
 
-def drawFunction(p,xcord,ycord,width,height,scale=1):
+def drawFunction(p,xcord,ycord,width,height):
     for i in range(len(p)-1):
         if p[i] != None and p[i+1] != None:
-            #pygame.draw.circle(win,(0,0,0),(winW//2+x,winH//2-round(y)),2)
             pygame.draw.line(screen,(0,0,255),(xcord+width/2+p[i][0],ycord+height/2-p[i][1]),(xcord+width/2+p[i+1][0],ycord+height/2-p[i+1][1]),3)
 
+#Draws any vertical lines passed
+def drawVertical(v,xcord,ycord,width,height,scale):
+    pygame.draw.line(screen,(200,0,200),(xcord+width//2+v*70/scale,ycord),(xcord+width//2+v*70/scale,ycord+height),3)
+        
 def redrawWin():
-    global functions
+    global functions,verticals
     screen.fill((255,255,255))
     #grid.drawGrid(screen,infoObject.current_w*0.8,infoObject.current_h*0.8,infoObject.current_w*0.2,0)
     grid.drawGrid(screen,WIDTH*0.75,HEIGHT*0.8,WIDTH*0.25,0)
@@ -66,7 +63,10 @@ def redrawWin():
     #Draws function(s)
     for f in range(len(functions)):
         drawFunction(functions[f],round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8))
+    for v in verticals:
+        drawVertical(v,round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8),grid.scale)
     pygame.draw.rect(screen,(255,255,255),(WIDTH*0.25,HEIGHT*0.8,WIDTH*0.75,HEIGHT*0.2))#Covers up the function if it exits the graph
+    pygame.draw.rect(screen,(255,255,255),(0,0,WIDTH*0.25,HEIGHT*0.8))#Covers up the function if it exits the graph
 
     #Drawing keyboard sections
     funcList.drawGrid(screen,(0,0,0))
@@ -84,14 +84,17 @@ def redrawWin():
     #Drawing extra GUI
     screen.blit(pymos,(6,6))
     funcList.highlightSelectedCell(screen)
+    angleMode.highlightCells(screen,[angleMode.text.index(radOrDeg)],(30,30,30))
     pygame.draw.line(screen,(97,178,66),(0.25*WIDTH-2,0),(0.25*WIDTH-2,0.8*HEIGHT),3)
     pygame.draw.line(screen,(97,178,66),(0,0.8*HEIGHT+2),(WIDTH,0.8*HEIGHT+2),3)
     pygame.display.update()
 
 def getFunctions():
+    global boxesUsed
     funcs = []
     for f in funcList.equations:
         funcs.append(list(f))
+    boxesUsed = [i for i,f in enumerate(funcs) if len(f) > 0]
     funcs = [Initialize(f) for f in funcs if len(f) > 0]
     return [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
 
@@ -107,19 +110,15 @@ variables = Grid((3,0.8*HEIGHT+5,0.25*WIDTH,0.2*HEIGHT-5),4,6,1,2,('monospace',1
 angleMode = Grid((WIDTH//2+0.22*WIDTH,0.8*HEIGHT+5,0.1*WIDTH,0.05*HEIGHT-2),1,2,1,2,('monospace',18),(0,0,0),['deg','rad'],True)
 keyboard = [keypad,operationpad,trigfunc,expofunc,miscfunc,variables,angleMode]
 
-#funcList.equations[0] = 'x'
-#funcList.updateFunctions()
-
 tick = 0
-# graph translation
 Use = True
 while Use:
     pygame.time.delay(20)
     #every half a second or so, the equations are tested for mistakes and added to the functions list if they make sense
     if tick % 20 == 0:
+        del verticals[:] #resets vertical lines
         customVars.clear()#resets customVars in case they were deleted
-        functions = getFunctions()
-    #print(funcList.equations)
+        functions = getFunctions() #gets the points for each function
     redrawWin()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -164,10 +163,8 @@ while Use:
                     funcList.equationAppend(variables.text[variables.mouseOverCell(mp[0],mp[1])])
                 elif funcList.mouseOverCell(mp[0],mp[1]) == None:
                     funcList.selectedFunction = None
-                funcList.updateFunctions()
-
                 if angleMode.mouseOverCell(mp[0],mp[1]) != None:
                     radOrDeg = angleMode.text[angleMode.mouseOverCell(mp[0],mp[1])]
-                    print(radOrDeg)
+                funcList.updateFunctions()
     tick += 1
 pygame.quit()
