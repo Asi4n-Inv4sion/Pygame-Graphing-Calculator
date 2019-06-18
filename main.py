@@ -24,7 +24,6 @@ boxesUsed = []
 colours = []
 boxesWithFunctions = []
 
-# Julian
 def getPoints(e,width,scale):
     p = []
     for x in range(-width//2,width//2):#equation variable changes depending on the graph being drawn
@@ -48,20 +47,17 @@ def getPoints(e,width,scale):
                     p.append((x,y))
     return p
 
-# Julian
 def drawFunction(p,xcord,ycord,width,height,colour,i):
     #draws each function created
     for i in range(len(p)-1):
         if p[i] != None and p[i+1] != None:
             pygame.draw.line(screen,colour,(xcord+width/2+p[i][0],round(ycord+height/2-p[i][1])),(xcord+width/2+p[i+1][0],round(ycord+height/2-p[i+1][1])),3)
 
-# Draws any vertical lines passed
-# Julian
+#Draws any vertical lines passed
 def drawVertical(v,xcord,ycord,width,height,scale):
     pygame.draw.line(screen,(200,0,200),(xcord+width//2+v*70/scale,ycord),(xcord+width//2+v*70/scale,ycord+height),3)
 
 # labels the colour of a box to correspond to the colour of the function
-# Julian
 def drawFuncColours(screen,x,y,colours,boxesUsed):
     for i in range(len(colours)):
         if i in boxesUsed:
@@ -81,9 +77,7 @@ def redrawWin():
     pygame.draw.rect(screen,(255,255,255),(WIDTH*0.25,HEIGHT*0.8,WIDTH*0.75,HEIGHT*0.2))#Covers up the function if it exits the graph
     pygame.draw.rect(screen,(255,255,255),(0,0,WIDTH*0.25,HEIGHT*0.8))#Covers up the function if it exits the graph
 
-    #for c in range(len(colours)):
-    #    pygame.draw.circle(screen,colours[c],(300,int(73+c*64.5)),6)
-    
+
     #Drawing keyboard sections
     funcList.drawGrid(screen,(0,0,0))
     for f in keyboard:
@@ -99,7 +93,6 @@ def redrawWin():
     pygame.draw.line(screen,(97,178,66),(0,0.8*HEIGHT+2),(WIDTH,0.8*HEIGHT+2),3)
     pygame.display.update()
 
-# Julian
 def getFunctions():
     global boxesUsed,colours,boxesWithFunctions
     funcs = []
@@ -117,7 +110,6 @@ def getFunctions():
     return [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
 
 # saves, loads, or deleted functions from a text file
-# Leo
 def fileFunc(f,mode):
     if mode == 'save':
         funcfile = open(f,'w')
@@ -125,7 +117,8 @@ def fileFunc(f,mode):
         funcfile.close()
     elif mode == 'load':
         funcfile = open(f,'r')
-        funcList.equations = [line.strip() for line in funcfile.readlines()]
+        for i,line in enumerate(funcfile.readlines()):
+            funcList.equations[i] = line.strip()
         funcfile.close()
     elif mode == 'delete':
         funcfile = open(f,'w')
@@ -170,7 +163,6 @@ while Use:
                 Use = False
             else:
                 funcList.equationKeyPress(event.key)
-
         if event.type == pygame.MOUSEBUTTONDOWN:
             mp = pygame.mouse.get_pos()
             if 0.25 * WIDTH < mp[0] < WIDTH and mp[1] < 0.8*HEIGHT:
@@ -182,7 +174,6 @@ while Use:
                     functions = getFunctions()
             if event.button == 1:
                 funcList.selectFunc(funcList.mouseOverCell(mp[0],mp[1]))
-                # detect if any keyboard key is pressed
                 if keypad.mouseOverCell(mp[0],mp[1]) != None:
                     funcList.equationAppend(keypad.text[keypad.mouseOverCell(mp[0],mp[1])])
                 elif operationpad.mouseOverCell(mp[0],mp[1]) != None:
