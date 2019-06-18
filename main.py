@@ -22,6 +22,7 @@ functions = []
 radOrDeg = "rad"
 boxesUsed = []
 colours = []
+boxesWithFunctions = []
 
 def getPoints(e,width,scale):
     p = []
@@ -46,7 +47,8 @@ def getPoints(e,width,scale):
                     p.append((x,y))
     return p
 
-def drawFunction(p,xcord,ycord,width,height,colour):
+def drawFunction(p,xcord,ycord,width,height,colour,i):
+    #draws each function created
     for i in range(len(p)-1):
         if p[i] != None and p[i+1] != None:
             pygame.draw.line(screen,colour,(xcord+width/2+p[i][0],round(ycord+height/2-p[i][1])),(xcord+width/2+p[i+1][0],round(ycord+height/2-p[i+1][1])),3)
@@ -69,12 +71,15 @@ def redrawWin():
 
     #Draws function(s)
     for f in range(len(functions)):
-        drawFunction(functions[f],round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8),colours[f])
+        drawFunction(functions[f],round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8),colours[f],f)
     for v in verticals:
         drawVertical(v,round(WIDTH*0.25),0,round(WIDTH*0.75),round(HEIGHT*0.8),grid.scale)
     pygame.draw.rect(screen,(255,255,255),(WIDTH*0.25,HEIGHT*0.8,WIDTH*0.75,HEIGHT*0.2))#Covers up the function if it exits the graph
     pygame.draw.rect(screen,(255,255,255),(0,0,WIDTH*0.25,HEIGHT*0.8))#Covers up the function if it exits the graph
 
+    #for c in range(len(colours)):
+    #    pygame.draw.circle(screen,colours[c],(300,int(73+c*64.5)),6)
+    
     #Drawing keyboard sections
     funcList.drawGrid(screen,(0,0,0))
     for f in keyboard:
@@ -82,22 +87,28 @@ def redrawWin():
 
     #Drawing extra GUI
     screen.blit(pymos,(6,6))
-    drawFuncColours(screen,300,73,funcList.colours,boxesUsed)
+    drawFuncColours(screen,300,73,funcList.colours,boxesWithFunctions)#draws colour circles for functions
     printText('Sowsep™',pygame.font.SysFont('consolas',40),screen,150,33)
     funcList.highlightSelectedCell(screen)
-    angleMode.highlightCells(screen,[angleMode.text.index(radOrDeg)],(30,30,30))
+    angleMode.highlightCells(screen,[angleMode.text.index(radOrDeg)],(25,25,25))
     pygame.draw.line(screen,(97,178,66),(0.25*WIDTH-2,0),(0.25*WIDTH-2,0.8*HEIGHT),3)
     pygame.draw.line(screen,(97,178,66),(0,0.8*HEIGHT+2),(WIDTH,0.8*HEIGHT+2),3)
     pygame.display.update()
 
 def getFunctions():
-    global boxesUsed,colours
+    global boxesUsed,colours,boxesWithFunctions
     funcs = []
     for f in funcList.equations:
         funcs.append(list(f))
+    #A list of gui function boxes with something written in them
     boxesUsed = [i for i,f in enumerate(funcs) if len(f) > 0]
-    colours = [funcList.colours[i] for i in boxesUsed]
+    #A lst of indexes for the gui function boxes with a function in them
+    boxesWithFunctions = [i for i,f in enumerate(funcs) if (len(f) == 1 and f[0] == "x")or (len(f) > 1 and (f[1] != "=" or f[0:2] == ['y','=']))]
+    #The colours for the functions
+    colours = [funcList.colours[i] for i in boxesWithFunctions]
+    #Creates a list of each function intitialized
     funcs = [Initialize(f) for f in funcs if len(f) > 0]
+    #returns a master list of nested lists with points for each solvable function
     return [getPoints(f,round(WIDTH*0.75),grid.scale) for f in funcs if type(f) == list and len(f) > 0]
 
 # saves, loads, or deleted functions from a text file
@@ -115,6 +126,7 @@ def fileFunc(f,mode):
         funcfile.writelines('')
         funcfile.close()
 
+#The good old print text function
 def printText(text, font, canvas, x, y):
     theText = font.render(text, 1, (0,0,0))
     textbox = theText.get_rect()
@@ -196,7 +208,7 @@ while Use:
                         fileFunc('saved_functions.txt','load')
                     elif filebuttons.mouseOverCell(mp[0],mp[1]) == 2:
                         fileFunc('saved_functions.txt','delete')
-
+                #updates the functions in case they were changed (backspace, etc)
                 funcList.updateFunctions()
     tick += 1
 pygame.quit()
