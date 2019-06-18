@@ -1,4 +1,5 @@
 # Python float rounder for multiplying by floats
+# Leo Wang
 
 import math, decimal
 
