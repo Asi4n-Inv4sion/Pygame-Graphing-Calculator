@@ -185,6 +185,7 @@ while Use:
                     functions = getFunctions()
             if event.button == 1:
                 funcList.selectFunc(funcList.mouseOverCell(mp[0],mp[1]))
+                # detect if any keyboard key is pressed
                 if keypad.mouseOverCell(mp[0],mp[1]) != None:
                     funcList.equationAppend(keypad.text[keypad.mouseOverCell(mp[0],mp[1])])
                 elif operationpad.mouseOverCell(mp[0],mp[1]) != None:
