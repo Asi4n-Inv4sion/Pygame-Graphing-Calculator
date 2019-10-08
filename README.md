@@ -1,4 +1,4 @@
 # Pygame-Graphing-Calculator
 ICS4U Final Project
 
-REEEEEEEEEEEEEEEEEEEEEEEE
+Uses pygame to mimic the onl;ine graphing calculator, Desmos.
